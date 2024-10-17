@@ -79,13 +79,12 @@ async def crawl_website(url):
 
             xss_result = check_xss(current_url)
             if xss_result["vulnerabilities"]:
-                for vuln in xss_result["vulnerabilities"]:
-                    vulnerabilities["Cross-Site Scripting (XSS)"].append({
-                        "url": vuln["url"],
-                        "payload": vuln["payload"],
-                        "response_excerpt": vuln.get("response_excerpt", 'None')
-                    })
-                    print(f"+ XSS vulnerability found at: {vuln['url']} with payload: {vuln['payload']}")
+                vulnerabilities["Cross-Site Scripting (XSS)"].append({
+                    "url": xss_result["url"],
+                    "payload": xss_result["payload"],
+                    "response_excerpt": xss_result.get("response_excerpt", 'None')
+                })
+                print(f"+ XSS vulnerability found at: {xss_result['url']} with payload: {xss_result['payload']}")
 
             if check_idor(current_url):
                 vulnerabilities["Insecure Direct Object Reference (IDOR)"].append(current_url)
