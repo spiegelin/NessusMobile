@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 
-const OSINTsearch: React.FC = () => (
+const OSINTsearch = () => (
   <View className="flex-1 p-5">
     <View className="flex-col justify-between items-center w-full mb-5">
       

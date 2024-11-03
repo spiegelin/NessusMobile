@@ -10,7 +10,7 @@ type LoginScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, 'Login'>;
 };
 
-const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => (
+const LoginScreen = ({ navigation }: LoginScreenProps) => (
   <View className="flex items-center justify-center p-5">
     <Text style={{ fontFamily: 'Vercel-semi', fontSize: 60 }} className="mt-20 mb-5 text-center">Security Scanner</Text>
     <Image source={require("../assets/bancoLogo.png")} className="mb-11" />

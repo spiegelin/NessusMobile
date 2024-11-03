@@ -6,7 +6,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useFonts } from 'expo-font';
 
 
-const AdvancedScan: React.FC = () => (
+const AdvancedScan = () => (
   <View className="flex-1 p-5">
     <View className="flex-col justify-between items-center w-full mb-6">
       

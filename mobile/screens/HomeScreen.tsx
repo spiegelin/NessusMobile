@@ -10,7 +10,7 @@ type HomeScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, 'Home'>;
 };
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+const HomeScreen = ({ navigation }: HomeScreenProps) => {
   const scanTools = [
     { name: 'Basic Scan', image: require('../assets/bancoLifeline2.png') , desc : "ARBOLITERS GO"},
     { name: 'Advanced Scan', image: require('../assets/bancoCogs.jpg') ,desc : "sample description bork chen"},

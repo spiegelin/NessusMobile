@@ -7,7 +7,7 @@ import { useFonts } from 'expo-font';
 import { RootStackParamList } from '../App';
 
 
-const BasicScanScreen: React.FC = () => (
+const BasicScanScreen = () => (
   <View className="flex-1 p-5">
     <View className="flex-col justify-between items-center w-full mb-6">
       
