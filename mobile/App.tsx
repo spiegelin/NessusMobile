@@ -13,10 +13,12 @@ import SecurityAwarenessScreen from './screens/SecurityAwarenessScreen';
 import ScanHistory from './screens/ScanHistory';
 import AdvancedScan from './screens/AdvancedScan';
 import OSINTsearch from './screens/OSINTsearch';
+import RegisterScreen from './screens/RegisterScreen';
 
 // Define the types for our navigation parameters
 export type RootStackParamList = {
   Login: undefined;
+  Register: undefined;
   Home: undefined;
   BasicScan: undefined;
   ViewReports: undefined;
@@ -40,11 +42,13 @@ const App: React.FC = () => {
     return <Text>Loading...</Text>
   }
   return (
-    
+
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
+        
         <Stack.Screen name="BasicScan" component={BasicScanScreen} />
         <Stack.Screen name="ViewReports" component={ViewReportsScreen} />
         <Stack.Screen name="SecurityAwareness" component={SecurityAwarenessScreen} />
