@@ -20,7 +20,7 @@ const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
       setError('Passwords do not match');
     } else {
       setError('');
-      navigation.navigate('Home');
+      navigation.navigate('Login');
     }
   };
 
