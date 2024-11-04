@@ -43,6 +43,22 @@ app.get('/log', async (req, res) => {
   }
 });
 
+app.post('/scan', async (req, res) => {
+  const { url_or_ip } = req.body;
+
+  try {
+    const log = await prisma.log.create({
+      data: {
+        url_or_ip
+      },
+    });
+    res.status(201).json({ message: 'Scan added successfully', log });
+  } catch (error) {
+    console.error('Error details:', error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
 app.get('/test', (req, res) => {
   res.send('Server is working!');
 });
