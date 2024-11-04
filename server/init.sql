@@ -23,6 +23,15 @@ CREATE TABLE "UserRoles" (
     FOREIGN KEY (role_id) REFERENCES "Role"(role_id) ON DELETE CASCADE
 );
 
+-- Create the Report table
+CREATE TABLE "Report" (
+    report_id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    summary TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES "User"(user_id) ON DELETE CASCADE
+);
+
 -- Create the Scan table
 CREATE TABLE "Scan" (
     scan_id SERIAL PRIMARY KEY,
@@ -33,15 +42,6 @@ CREATE TABLE "Scan" (
     report_id INT,
     FOREIGN KEY (user_id) REFERENCES "User"(user_id) ON DELETE CASCADE,
     FOREIGN KEY (report_id) REFERENCES "Report"(report_id) ON DELETE SET NULL
-);
-
--- Create the Report table
-CREATE TABLE "Report" (
-    report_id SERIAL PRIMARY KEY,
-    user_id INT NOT NULL,
-    summary TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES "User"(user_id) ON DELETE CASCADE
 );
 
 -- Create the Vulnerability table

@@ -1,15 +1,23 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+import axios from 'axios';
 
 
 const ScanHistory: React.FC = () => {
-  const reports = [
-    { name: 'Report 1', details: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
-    { name: 'Report 2', details: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.' },
-    { name: 'Report 3', details: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.' },
-  ];
-
+  const [reports, setReports] = useState<any[]>([]);
   const [openReportIndex, setOpenReportIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const response = await axios.get('http://192.168.100.238:3000/log');
+        setReports(response.data.logs);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchHistory();
+  }, []);
 
   const toggleReport = (index: number) => {
     setOpenReportIndex(openReportIndex === index ? null : index);
@@ -28,7 +36,7 @@ const ScanHistory: React.FC = () => {
       {reports.map((report, index) => (
         <View key={index} className="w-full mb-4">
           <View className="flex-row justify-between items-center p-3 bg-gray-200">
-            <Text className="text-base">{report.name}</Text>
+            <Text className="text-base">{report.action}</Text>
             <TouchableOpacity
               className="bg-black p-2 rounded"
               onPress={() => toggleReport(index)}
@@ -38,7 +46,7 @@ const ScanHistory: React.FC = () => {
           </View>
           {openReportIndex === index && (
             <View className="p-3 bg-gray-100">
-              <Text className="text-gray-700">{report.details}</Text>
+              <Text className="text-gray-700">{report.timestamp}</Text>
             </View>
           )}
         </View>

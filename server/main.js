@@ -31,6 +31,17 @@ app.post('/users', async (req, res) => {
   }
 });
 
+//Scan History
+app.get('/log', async (req, res) => {
+  try {
+    const logs = await prisma.log.findMany();
+    res.status(200).json({ message: 'Logs retrieved successfully', logs });
+  } 
+  catch (error) {
+    console.error('Error details:', error);
+    res.status(400).json({ error: error.message });
+  }
+});
 
 app.get('/test', (req, res) => {
   res.send('Server is working!');
