@@ -12,6 +12,8 @@ load_dotenv()
 #CVE_DB_URL = os.getenv("BASE_URL_CVE")
 HUNTER_API_KEY = os.getenv("API_KEY_HUNTER")
 HUNTER_URL = os.getenv("BASE_URL_HUNTER")
+DEHASHED_API_KEY = os.getenv("API_KEY_DEHASHED")
+DEHASHED_USERNAME = os.getenv("USERNAME_DEHASHED")
 
 
 async def shodan_scan(ip_or_domain: str):
@@ -127,7 +129,29 @@ async def socials_discovery(domain: str):
         }
     except Exception as e:
         raise Exception(status_code=500, detail=str(e))
-        
+
+async def find_passwords(email: str):
+    # Search for passwords and hashes using the Dehashed API
+    url = f"https://api.dehashed.com/search?query={email}"
+
+    # Prepare the headers for Basic Authentication
+    headers = {
+        "Accept": "application/json",
+    }
+
+    try:
+        response = requests.get(url, headers=headers, auth=(DEHASHED_USERNAME, DEHASHED_API_KEY))
+        # Check for successful response
+        if response.status_code == 200:
+            print(response)
+            data = response.json()
+            print(data)
+            return data
+        else:
+            print(f"Error: {response.status_code}, {response.text}")
+    except Exception as e:
+        raise Exception(status_code=500, detail=str(e))
+
 
 def resolve_domain(domain: str):
     """Resolves a domain to an IP address using socket"""

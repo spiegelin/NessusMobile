@@ -1,10 +1,12 @@
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
-from osint_search import shodan_scan, socials_discovery
+from osint_search import shodan_scan, socials_discovery, find_passwords
 import uvicorn
 import os
 from pydantic import BaseModel
 from Spider import crawl_website
+
+# uvicorn main:app --reload
 
 
 app = FastAPI()
@@ -57,6 +59,15 @@ async def socials(target: Target):
     try:
         socials_data = await socials_discovery(target.target)
         return socials_data
+    except Exception as e:
+        return {"error": str(e)}
+    
+# Get passwords and hashes from an associated email/domain
+@app.post("/passwords")
+async def passwords(target: Target):
+    try:
+        passwords_data = await find_passwords(target.target)
+        return passwords_data
     except Exception as e:
         return {"error": str(e)}
 
