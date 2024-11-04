@@ -8,42 +8,31 @@ type RegisterScreenProps = {
 };
 
 const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleRegister = () => {
-    if (password === confirmPassword) {
-      navigation.navigate('Home');
-    } else {
+    if (!email || !password) {
+      setError('Please fill in all fields');
+    } else if (password !== confirmPassword) {
       setError('Passwords do not match');
+    } else {
+      setError('');
+      navigation.navigate('Home');
     }
   };
 
   return (
-    <View className="flex items-center justify-center p-6">
+    <View className="flex items-center justify-center p-5">
       <Text style={{ fontFamily: 'Vercel-semi', fontSize: 60 }} className="mt-20 mb-5 text-center">
         Security Scanner
       </Text>
       <Image source={require("../assets/bancoLogo.png")} className="mb-11" />
-      <TextInput
-        className="w-full h-10 border border-gray-400 rounded mb-3 px-3"
-        placeholder="Email"
-      />
-      <TextInput
-        className="w-full h-10 border border-gray-400 rounded mb-3 px-3"
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-      <TextInput
-        className="w-full h-10 border border-gray-400 rounded mb-3 px-3"
-        placeholder="Confirm Password"
-        secureTextEntry
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-      />
+      <TextInput className="w-full h-10 border border-gray-400 rounded mb-3 px-3" placeholder="Email" value={email} onChangeText={setEmail} />
+      <TextInput className="w-full h-10 border border-gray-400 rounded mb-3 px-3" placeholder="Password" secureTextEntry value={password} onChangeText={setPassword} />
+      <TextInput className="w-full h-10 border border-gray-400 rounded mb-3 px-3" placeholder="Confirm Password" secureTextEntry value={confirmPassword} onChangeText={setConfirmPassword}/>
       {error ? <Text className="text-red-500 mb-3">{error}</Text> : null}
       <View className="flex-row justify-around w-full">
         <TouchableOpacity className="bg-red-500 p-3 rounded-md mt-3" onPress={handleRegister}>
