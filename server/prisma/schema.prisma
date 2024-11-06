@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id       Int         @id @default(autoincrement())
+  username      String      @unique
+  email         String      @unique
+  password_hash String
+  created_at    DateTime    @default(now())
+  last_login    DateTime?
+  logs          Log[]
+  reports       Report[]
+  scans         Scan[]
+  roles         UserRoles[]
+}
+
+model Role {
+  role_id   Int         @id @default(autoincrement())
+  role_name String      @unique
+  users     UserRoles[]
+}
+
+model UserRoles {
+  userId  Int
+  roleId  Int
+  role_id Role @relation(fields: [roleId], references: [role_id])
+  user_id User @relation(fields: [userId], references: [user_id])
+
+  @@id([userId, roleId])
+}
+
+model Scan {
+  scan_id         Int                   @id @default(autoincrement())
+  url_or_ip       String
+  scan_type       ScanType
+  scan_date       DateTime              @default(now())
+  user_id         Int
+  report_id       Int?
+  report          Report?               @relation(fields: [report_id], references: [report_id])
+  user            User                  @relation(fields: [user_id], references: [user_id])
+  vulnerabilities ScanVulnerabilities[]
+}
+
+model Report {
+  report_id  Int      @id @default(autoincrement())
+  user_id    Int
+  summary    String
+  created_at DateTime @default(now())
+  user       User     @relation(fields: [user_id], references: [user_id])
+  scans      Scan[]
+}
+
+model Vulnerability {
+  vulnerability_id Int                   @id @default(autoincrement())
+  cve              String                @unique
+  description      String
+  cvss_score       Float
+  scans            ScanVulnerabilities[]
+}
+
+model ScanVulnerabilities {
+  scan_id          Int
+  vulnerability_id Int
+  recommendation   String
+  scan             Scan          @relation(fields: [scan_id], references: [scan_id])
+  vulnerability    Vulnerability @relation(fields: [vulnerability_id], references: [vulnerability_id])
+
+  @@id([scan_id, vulnerability_id])
+}
+
+model Log {
+  log_id    Int      @id @default(autoincrement())
+  user_id   Int
+  action    String
+  timestamp DateTime @default(now())
+  user      User     @relation(fields: [user_id], references: [user_id])
+}
+
+enum ScanType {
+  passive
+  active
+}
