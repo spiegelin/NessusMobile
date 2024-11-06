@@ -32,7 +32,7 @@ const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
         password
     });
       if (response.status === 201) {
-        navigation.navigate('Home');
+        navigation.navigate('Login');
       }
     } catch (error) {
       console.error(error);
