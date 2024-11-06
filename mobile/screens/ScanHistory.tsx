@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from 'reac
 import axios from 'axios';
 
 
+
 const ScanHistory: React.FC = () => {
   const [reports, setReports] = useState<any[]>([]);
   const [openReportIndex, setOpenReportIndex] = useState<number | null>(null);

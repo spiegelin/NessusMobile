@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 
 
-const ViewReportsScreen: React.FC = () => {
+const ViewReportsScreen= () => {
   const reports = [
     { name: 'Report 1', details: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.' },
     { name: 'Report 2', details: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.' },

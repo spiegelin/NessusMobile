@@ -3,7 +3,7 @@ import React, {useState} from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
 
 
-const SecurityAwarenessScreen: React.FC = () => {
+const SecurityAwarenessScreen = () => {
   const [openTipIndex, setOpenTipIndex] = useState<number | null>(null);
 
   const toggleTip = (index: number) => {
