@@ -11,7 +11,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret'; // Use an enviro
 app.use(express.json());
 
 // New user registration
-app.post('/users', async (req, res) => {
+app.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
 
   try {
