@@ -14,16 +14,15 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://192.168.100.13/login', { email, password });
-      console.log(response.data);
+      //remplazar la ip con tu ip 
+      const response = await axios.post('http://192.168.100.13:3000/login', { email, password });
       const token = response.data.token;
-      
       if (token) {
         navigation.navigate('Home');
       }
     } catch (error) {
       Alert.alert("Login Failed", "Please check your email and password.");
-      console.error("Login error:", error);
+      console.error("Login error:", error.response || error.message);
     }
   };
 
