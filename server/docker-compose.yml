@@ -1,4 +1,20 @@
+#version: '3.8'
+
 services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    networks:
+      - app-network
+
   db:
     image: postgres:latest
     container_name: my_postgres_db
@@ -11,6 +27,28 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - app-network
+
+  nessus:
+    image: tenable/nessus:${VERSION_OS}
+    platform: linux/amd64
+    restart: always
+    container_name: nessus
+    environment:
+      USERNAME: ${NESSUS_USERNAME}         
+      PASSWORD: ${NESSUS_PASSWORD}
+      ACTIVATION_CODE: ${NESSUS_ACTIVATION_CODE}
+    ports:
+      - "8834:8834"
+    networks:
+      - app-network
+    mem_limit: 4g  
+    cpus: 2
 
 volumes:
   postgres_data:
+  nessus_data:
+
+networks:
+  app-network:

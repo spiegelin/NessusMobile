@@ -1,4 +1,4 @@
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from osint_search import shodan_scan, socials_discovery, find_passwords
 import uvicorn

@@ -1,6 +1,7 @@
 fastapi
 uvicorn
 requests
-tenable
 httpx
 aiohttp
+python-dotenv
+bs4
