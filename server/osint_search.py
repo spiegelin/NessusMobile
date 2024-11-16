@@ -3,6 +3,7 @@ import requests
 import os
 import sys
 import socket
+import asyncio
 
 # Load the environment variables
 load_dotenv()
@@ -160,3 +161,39 @@ def resolve_domain(domain: str):
         return ip
     except socket.gaierror:
         raise Exception(status_code=400, detail="Invalid domain or unable to resolve")
+    
+async def main(ip_or_domain, domain, email):
+    # Ejecutar las funciones asincrónicamente y en paralelo
+    shodan_task = shodan_scan(ip_or_domain)
+    socials_task = socials_discovery(domain)
+    passwords_task = find_passwords(email)
+
+    # Ejecuta las tareas de forma concurrente y espera a que todas finalicen
+    results = await asyncio.gather(shodan_task, socials_task, passwords_task, return_exceptions=True)
+
+    # Manejo de resultados
+    shodan_result, socials_result, passwords_result = results
+
+    if isinstance(shodan_result, Exception):
+        print("Error en shodan_scan:", shodan_result)
+    else:
+        print("Resultado de shodan_scan:", shodan_result)
+
+    if isinstance(socials_result, Exception):
+        print("Error en socials_discovery:", socials_result)
+    else:
+        print("Resultado de socials_discovery:", socials_result)
+
+    if isinstance(passwords_result, Exception):
+        print("Error en find_passwords:", passwords_result)
+    else:
+        print("Resultado de find_passwords:", passwords_result)
+
+# Para ejecutar el main asincrónicamente
+if __name__ == "__main__":
+    ip_or_domain = "example.com"
+    domain = "example.com"
+    email = "user@example.com"
+
+    # Ejecuta el evento principal
+    asyncio.run(main(ip_or_domain, domain, email))
