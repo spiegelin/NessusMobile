@@ -3,7 +3,7 @@
 services:
   nessus-controller:
     build:
-      context: .
+      context: ./nessus
       dockerfile: Dockerfile
     container_name: nessus-controller
     env_file:
@@ -15,8 +15,8 @@ services:
     
   express-backend:
     build:
-      context: ./path-to-express-backend
-      dockerfile: Dockerfile-express
+      context: ./app
+      dockerfile: Dockerfile-Express
     container_name: express-backend
     ports:
       - "3000:3000"
@@ -36,7 +36,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - app-network
 

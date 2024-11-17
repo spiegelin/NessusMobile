@@ -18,7 +18,7 @@ const ScanHistory: React.FC = () => {
       const token = await SecureStore.getItemAsync('authToken');
       setLoading(true);
       try {
-        const response = await axios.get(`${proccess.env.IP}/log`, {
+        const response = await axios.get(`http://127.0.0.1:3000/log`, {
           headers: {
             Authorization: `Bearer ${token}`,
         }

@@ -18,6 +18,7 @@ model User {
   reports       Report[]
   scans         Scan[]
   roles         UserRoles[]
+  apiKeys       ApiKey[]
 }
 
 model Role {
@@ -85,4 +86,17 @@ model Log {
 enum ScanType {
   passive
   active
+}
+
+model ApiKey {
+  id         Int      @id @default(autoincrement())
+  user_id     Int     
+  servicio   String   
+  apiKey     String   
+  created_at  DateTime @default(now()) 
+  updated_at  DateTime @updatedAt
+
+  user       User     @relation(fields: [user_id], references: [user_id])
+
+  @@unique([user_id, servicio])
 }
