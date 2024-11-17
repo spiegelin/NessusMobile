@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Image, Alert } from 'react-nat
 import { StackNavigationProp } from '@react-navigation/stack';
 import axios from 'axios';
 import { RootStackParamList } from '../App';
+import * as SecureStore from 'expo-secure-store';
 
 type LoginScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, 'Login'>;
@@ -14,10 +15,14 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
 
   const handleLogin = async () => {
     try {
-      //remplazar la ip con tu ip 
-      const response = await axios.post('http://192.168.100.13:3000/login', { email, password });
+      const response = await axios.post(`${proccess.env.IP}/login`, { email, password });
       const token = response.data.token;
+  
       if (token) {
+        await SecureStore.setItemAsync('authToken', token);
+        //console.error("Token:", token);
+        //SecureStore.getItemAsync('authToken').then(console.error);
+  
         navigation.navigate('Home');
       }
     } catch (error) {
