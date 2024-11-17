@@ -1,20 +1,34 @@
-import React, {useEffect, useState} from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
 
-
+interface Report {
+  action: string;
+  timestamp: string;
+}
 
 const ScanHistory: React.FC = () => {
-  const [reports, setReports] = useState<any[]>([]);
+  const [reports, setReports] = useState<Report[]>([]);
   const [openReportIndex, setOpenReportIndex] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchHistory = async () => {
+      const token = await SecureStore.getItemAsync('authToken');
+      setLoading(true);
       try {
-        const response = await axios.get('http://192.168.100.238:3000/log');
+        const response = await axios.get(`${proccess.env.IP}/log`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+        }
+        });
         setReports(response.data.logs);
       } catch (error) {
-        console.error(error);
+        console.error(error, "hola", error.response);
+        Alert.alert("Error", "Failed to load scan history.");
+      } finally {
+        setLoading(false); 
       }
     };
     fetchHistory();
@@ -27,34 +41,35 @@ const ScanHistory: React.FC = () => {
   return (
     <View className="flex-1 p-5">
       <View className="flex-col justify-between items-center w-full mb-5">
-        <Text style={{ fontFamily: 'Vercel-semi', fontSize: 45 }} className="mb-5 text-center">
-          Scan History
-        </Text>
+        <Text className="text-5xl font-semibold mb-5 text-center">Scan History</Text>
       </View>
-      <Text style={{ fontFamily: 'Vercel-semi', fontSize: 30 }} className="text-gray-700 mb-3">
-        Latest Reports
-      </Text>
-      {reports.map((report, index) => (
-        <View key={index} className="w-full mb-4">
-          <View className="flex-row justify-between items-center p-3 bg-gray-200">
-            <Text className="text-base">{report.action}</Text>
-            <TouchableOpacity
-              className="bg-black p-2 rounded"
-              onPress={() => toggleReport(index)}
-            >
-              <Text className="text-white">{openReportIndex === index ? 'Close' : 'Open'}</Text>
-            </TouchableOpacity>
-          </View>
-          {openReportIndex === index && (
-            <View className="p-3 bg-gray-100">
-              <Text className="text-gray-700">{report.timestamp}</Text>
+
+      <Text className="text-3xl text-gray-700 mb-3">Latest Reports</Text>
+
+      {loading ? (
+        <ActivityIndicator size="large" color="#0000ff" />
+      ) : (
+        reports.map((report, index) => (
+          <View key={index} className="w-full mb-4">
+            <View className="flex-row justify-between items-center p-3 bg-gray-200 rounded-lg">
+              <Text className="text-base">{report.action}</Text>
+              <TouchableOpacity
+                className="bg-black p-2 rounded"
+                onPress={() => toggleReport(index)}
+              >
+                <Text className="text-white">{openReportIndex === index ? 'Close' : 'Open'}</Text>
+              </TouchableOpacity>
             </View>
-          )}
-        </View>
-      ))}
+            {openReportIndex === index && (
+              <View className="p-3 bg-gray-100 rounded-lg">
+                <Text className="text-gray-700">{report.timestamp}</Text>
+              </View>
+            )}
+          </View>
+        ))
+      )}
     </View>
   );
 };
-
 
 export default ScanHistory;

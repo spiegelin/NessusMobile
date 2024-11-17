@@ -107,7 +107,7 @@ app.get('/test', (req, res) => {
   res.send('Server is working!');
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORTBACK || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });

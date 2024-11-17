@@ -26,7 +26,7 @@ const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
       setError('');      
     }
     try {
-      const response = await axios.post('http://192.168.100.238:3000/register', {
+      const response = await axios.post(`${proccess.env.IP}/register`, {
         email,
         username,
         password
