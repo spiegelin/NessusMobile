@@ -8,7 +8,7 @@ interface Report {
   timestamp: string;
 }
 
-const ScanHistory: React.FC = () => {
+const ScanHistory = () => {
   const [reports, setReports] = useState<Report[]>([]);
   const [openReportIndex, setOpenReportIndex] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
