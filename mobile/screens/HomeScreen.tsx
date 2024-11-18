@@ -13,7 +13,7 @@ type HomeScreenProps = {
 const HomeScreen = ({ navigation }: HomeScreenProps) => {
   const scanTools = [
     { name: 'Basic Scan', image: require('../assets/bancoLifeline2.png') , desc : "ARBOLITERS GO"},
-    { name: 'Advanced Scan', image: require('../assets/bancoCogs.jpg') ,desc : "sample description bork chen"},
+    { name: 'Advanced Scans', image: require('../assets/bancoCogs.jpg') ,desc : "sample description bork chen"},
     { name: 'OSINT search', image: require('../assets/bancoWeb.png') , desc : "sample description bork chen"},
     { name: 'View Reports', image: require('../assets/bancoReports4.png') , desc : "sample description bork chen"},
     { name: 'Scan History', image: require('../assets/bancoHistory.png') , desc : "sample description bork chen"},

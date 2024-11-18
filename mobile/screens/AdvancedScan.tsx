@@ -12,16 +12,16 @@ type AdvancedScanProps = {
 
 const AdvancedScans = ({ navigation }: AdvancedScanProps) => {
   const advancedScanTools = [
-    { name: 'Web App Scan', image: require('../assets/bancoLifeline2.png') , desc : "adssaddsasadasdads"},
+    { name: 'WebApp Scan', image: require('../assets/bancoCogs.jpg') , desc : "adssaddsasadasdads"},
     { name: 'Host Discovery', image: require('../assets/bancoCogs.jpg') ,desc : "sdddddd"},
-    { name: 'Malware Scan', image: require('../assets/bancoWeb.png') , desc : "sdsdsdsd"},
+    { name: 'Malware Scan', image: require('../assets/bancoCogs.jpg') , desc : "sdsdsdsd"},
    
   ];
  
   return (
     <View className="flex p-5 items-center">
       <View className="flex-col justify-between items-center w-full ">
-        <Text style={{ fontFamily: "Vercel-semi", fontSize: 40 }} className="text-center">Security Scanner</Text>
+        <Text style={{ fontFamily: "Vercel-semi", fontSize: 40 }} className="text-center">Advanced Scanning</Text>
       </View>
       <Text style={{ fontFamily: "Vercel-semi", fontSize: 25 }} className="text-xl font-bold mb-1 text-gray-700" >Tools</Text>
       <View className="flex-row flex-wrap justify-around">
