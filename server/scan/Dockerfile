@@ -2,13 +2,13 @@
 FROM python:3.11-slim
 
 # Configura el directorio de trabajo en el contenedor
-WORKDIR /nessus-controller
+WORKDIR /scan-controller
 
 # Copia los archivos de tu proyecto al contenedor
-COPY . /nessus-controller
+COPY . /scan-controller
 
 # Instala las dependencias necesarias (asegúrate de tener un archivo requirements.txt)
-RUN pip install --no-cache-dir -r /nessus-controller/requirements.txt
+RUN pip install --no-cache-dir -r /scan-controller/requirements.txt
 
 # Exponer el puerto 8000, que es el puerto donde FastAPI y Uvicorn escucharán
 EXPOSE 8000

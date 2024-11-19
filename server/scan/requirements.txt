@@ -5,3 +5,6 @@ httpx
 aiohttp
 python-dotenv
 bs4
+zaproxy
+gvm-tools==21.1.0
+python-gvm

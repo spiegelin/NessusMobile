@@ -1,11 +1,11 @@
 #version: '3.8'
 
 services:
-  nessus-controller:
+  scan-controller:
     build:
-      context: ./nessus
+      context: ./scan
       dockerfile: Dockerfile
-    container_name: nessus-controller
+    container_name: scan-controller
     env_file:
       - .env
     ports:
@@ -39,28 +39,36 @@ services:
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - app-network
-
-  nessus:
-    image: tenable/nessus:${VERSION_OS}
-    platform: linux/amd64
-    restart: always
-    container_name: nessus
-    environment:
-      USERNAME: ${NESSUS_USERNAME}         
-      PASSWORD: ${NESSUS_PASSWORD}
-      ACTIVATION_CODE: ${NESSUS_ACTIVATION_CODE}
+  
+  zap-scanner:
+    image: zaproxy/zap-stable
+    container_name: zap-scanner
+    command: zap.sh -daemon -host 0.0.0.0 -port 8090 -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true -config api.key=${ZAP_API_KEY}
     ports:
-      - "8834:8834"
+      - "8090:8090"
     networks:
       - app-network
-    mem_limit: 8g  
-    cpus: 4
+    environment:
+      - JAVA_OPTS=-Xmx512m
+
+  openvas-scanner:
+    image: securecompliance/gvm
+    container_name: openvas-scanner
+    ports:
+      - "9392:9392" # Web UI
+      - "9390:9390" # GMP API
+    platform: linux/amd64
+    networks:
+      - app-network
     volumes:
-      - nessus_data:/var/lib/nessus/data
+      - openvas_data:/data
+    environment:
+    - USERNAME=${OPENVAS_USER} 
+    - PASSWORD=${OPENVAS_PASSWORD} 
 
 volumes:
   postgres_data:
-  nessus_data:
+  openvas_data:
 
 networks:
   app-network:
