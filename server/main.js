@@ -14,7 +14,7 @@ app.use(express.json());
 app.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
 
-  try {
+  try { 
     const password_hash = await bcrypt.hash(password, 10);
 
     const user = await prisma.user.create({
@@ -90,6 +90,20 @@ app.get('/log', authenticateToken, async (req, res) => {
 });
 
 app.post('/scan', authenticateToken, async (req, res) => {
+  const { url_or_ip } = req.body;
+
+  try {
+    const log = await prisma.log.create({
+      data: { url_or_ip },
+    });
+    res.status(201).json({ message: 'Scan added successfully', log });
+  } catch (error) {
+    console.error('Error details:', error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.post('/webappscan', authenticateToken, async (req, res) => {
   const { url_or_ip } = req.body;
 
   try {
