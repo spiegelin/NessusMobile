@@ -6,6 +6,7 @@ from lxml import etree  # Import lxml for XML parsing
 import time
 from dotenv import load_dotenv
 import os
+import json
 
 
 # CVE scanner_id: 6acd0832-df90-11e4-b9d5-28d24461215b
@@ -179,6 +180,104 @@ def list_scan_configs(gmp):
     except Exception as e:
         print(f"[ERROR] Failed to retrieve scan configurations: {e}")
 
+def generate_report_json(gmp, task_id):
+    """
+    Genera un reporte en formato JSON para la tarea dada.
+    """
+    try:
+        # Obtener información de la tarea
+        response = gmp.get_task(task_id=task_id)
+
+        # Parsear la respuesta en un objeto XML
+        response_xml = etree.fromstring(str(response))  # Convertir string a elemento XML
+
+        # Extraer el ID del reporte usando XPath
+        report_id_elements = response_xml.xpath("//last_report/report/@id")
+
+        if not report_id_elements:
+            print("[ERROR] No se encontró el ID del reporte.")
+            return {"error": "No se encontró el ID del reporte."}
+        
+        report_id = report_id_elements[0]
+
+        # Obtener el reporte en formato JSON
+        # El formato de reporte debe soportar JSON; este es un ejemplo estándar
+        json_report_format_id = "a3810a62-1f62-11e1-9219-406186ea4fc5"  # ID del formato JSON
+        report = gmp.get_report(report_id=report_id, report_format_id=json_report_format_id)
+
+        # Convertir el reporte de string a objeto JSON
+        json_report = json.loads(str(report))
+
+        print("[INFO] Reporte generado exitosamente en formato JSON")
+        return json_report
+    except Exception as e:
+        print(f"[ERROR] Error al generar el reporte JSON: {e}")
+        return {"error": str(e)}
+
+
+def openvas_scan(ip, scan_type):
+    try:
+        # Connect to OpenVAS
+        gmp = connect_to_openvas()
+        res = {}
+
+        if scan_type == "host_discovery":
+            # Host Discovery Scan
+            print("[INFO] Starting Host Discovery Scan")
+            discovery_target_id = create_target(gmp, "Host Discovery Target", ip)
+            if discovery_target_id:
+                discovery_task_id = start_scan(gmp, "Host Discovery", discovery_target_id, "2d3f051c-55ba-11e3-bf43-406186ea4fc5", DEFAULT_SCANNER_ID)
+                if discovery_task_id:
+                    wait_for_scan_completion(gmp, discovery_task_id)
+                    report_json = generate_report_json(gmp, discovery_task_id)
+                    return report_json
+                else:
+                    print("[ERROR] Host Discovery scan task creation failed.")
+                    return {"error": "Fallo en la creación de la tarea de escaneo de descubrimiento de hosts."}
+            else:
+                print("[ERROR] Host Discovery target creation failed.")
+                return {"error": "Fallo en la creación de la tarea de escaneo de descubrimiento de hosts."}
+
+        elif scan_type == "basic":
+            # Basic Scan
+            print("[INFO] Starting Basic Scan")
+            basic_target_id = create_target(gmp, "Basic Scan Target", ip)
+            if basic_target_id:
+                basic_task_id = start_scan(gmp, "Basic Scan", basic_target_id, "daba56c8-73ec-11df-a475-002264764cea", DEFAULT_SCANNER_ID)
+                if basic_task_id:
+                    wait_for_scan_completion(gmp, basic_task_id)
+                    report_json = generate_report_json(gmp, discovery_task_id)
+                    return report_json
+                else:
+                    print("[ERROR] Basic scan task creation failed.")
+                    return {"error": "Fallo en la creación de la tarea de escaneo básico."}
+            else:
+                print("[ERROR] Basic scan target creation failed.")
+                return {"error": "Fallo en la creación de la tarea de escaneo básico."}
+
+        elif scan_type == "malware":
+            # Malware Scan
+            print("[INFO] Starting Malware Scan")
+            malware_target_id = create_target(gmp, "Malware Scan Target", ip)
+            if malware_target_id:
+                malware_task_id = start_scan(gmp, "Malware Scan", malware_target_id, "bbca7412-a950-11e3-9109-406186ea4fc5", DEFAULT_SCANNER_ID)
+                if malware_task_id:
+                    wait_for_scan_completion(gmp, malware_task_id)
+                    report_json = generate_report_json(gmp, discovery_task_id)
+                    return report_json
+                else:
+                    print("[ERROR] Malware scan task creation failed.")
+                    return {"error": "Fallo en la creación de la tarea de escaneo básico."}
+            else:
+                print("[ERROR] Malware scan target creation failed.")
+                return {"error": "Fallo en la creación de la tarea de escaneo básico."}
+
+        else:
+            print("[ERROR] Invalid scan type specified.")
+            return {"error": "Invalid scan type specified."}
+    except:
+        return {"error": "An error occurred"}
+
 
 if __name__ == "__main__":
     try:
@@ -187,7 +286,6 @@ if __name__ == "__main__":
         #list_scan_configs(gmp)
 
         # Host Discovery Scan
-        
         print("[INFO] Starting Host Discovery Scan")
         discovery_target_id = create_target(gmp, "Host Discovery Target", SCAN_TARGETS)
         if discovery_target_id:

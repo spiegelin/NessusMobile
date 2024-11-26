@@ -52,6 +52,27 @@ def generate_report(output_file_html='zap_report.html', output_file_json='zap_re
     print(f"[SAVED] Report saved to {output_file_json}")
 
 
+def zap_scan(target_url):
+    """
+    Initiates a full scan using ZAP.
+    """
+    try:
+        # Passive Scan
+        start_passive_scan(target_url)
+
+        # Active Scan
+        start_active_scan(target_url)
+
+        # Generate Report
+        generate_report()
+        print("[SUCCESS] Scanning Completed Successfully!")
+        return zap.core.jsonreport()
+
+    except Exception as e:
+        print(f"[ERROR] An error occurred: {e}")
+        return {"error": str(e)}
+
+
 if __name__ == "__main__":
     try:
         # Passive Scan

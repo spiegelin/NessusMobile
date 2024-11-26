@@ -1,10 +1,12 @@
 #from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from osint_search import shodan_scan, socials_discovery, find_passwords
 import uvicorn
 import os
 from pydantic import BaseModel
 from Spider import crawl_website
+from openvas_scanner import openvas_scan
+from zap_scanner import zap_scan
 
 # uvicorn main:app --reload
 
@@ -86,6 +88,33 @@ async def crawl(target: Target):
         return crawled_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# Scan a target IP based on the provided scan type via the key
+# http://127.0.0.1:8000/scan?scan_type=host_discovery
+# http://127.0.0.1:8000/scan?scan_type=basic
+# http://127.0.0.1:8000/scan?scan_type=malware
+@app.post("/scan")
+async def scan(target: Target, scan_type: str = Query(..., description="Type of scan to perform")):
+    """
+    Endpoint to scan a target IP based on the provided scan type.
+    """
+    try:
+        # Call the scan function with the target and scan type
+        scan_data = await openvas_scan(target.target, scan_type)
+        return scan_data
+    except Exception as e:
+        # Return an error response in case of an exception
+        return {"error": str(e)}
+
+# Scan a web application using OWASP ZAP
+@app.post("/web-scan")
+async def web_scan(target: Target):
+    try:
+        # Perform the scan
+        scan_data = await zap_scan(target.target)
+        return scan_data
+    except Exception as e:
+        return {"error": str(e)}
 
 # Load environment variables and start the server
 if __name__ == "__main__":
