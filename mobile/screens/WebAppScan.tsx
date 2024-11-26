@@ -8,7 +8,7 @@ const WebAppScan = () => {
 
   const handleScan = async () => {
     try {
-      const response = await axios.post('http://localhost:3000/scan', { input });
+      const response = await axios.post('http://localhost:3000/webappscan', { input });
       setResult(response.data.message); // Update result state with server response
     } catch (error) {
       console.error('Error:', error);

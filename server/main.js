@@ -103,18 +103,10 @@ app.post('/scan', authenticateToken, async (req, res) => {
   }
 });
 
-app.post('/webappscan', authenticateToken, async (req, res) => {
-  const { url_or_ip } = req.body;
-
-  try {
-    const log = await prisma.log.create({
-      data: { url_or_ip },
-    });
-    res.status(201).json({ message: 'Scan added successfully', log });
-  } catch (error) {
-    console.error('Error details:', error);
-    res.status(400).json({ error: error.message });
-  }
+app.post('/webappscan', async (req, res) => {
+  const { input } = req.body; // Extract input from request body
+    console.log('Received input:', input);
+    res.status(200).send({ message: `You entered: ${input}` });
 });
 
 app.get('/test', (req, res) => {
