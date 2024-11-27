@@ -27,16 +27,16 @@ export type RootStackParamList = {
   ViewReports: undefined;
   SecurityAwareness: undefined;
   ScanHistory: undefined;
-  AdvancedScans: undefined;
+  AdvancedScan: undefined;
   OSINTsearch: undefined;
+  WebAppScan: undefined;
   MalwareScan: undefined;
   HostDiscovery: undefined;
-  WebAppScan: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
 
-const App: React.FC = () => {
+const App = () => {
   let [fontsLoaded] = useFonts({
     "Roboto": require("./assets/fonts/Roboto-Regular.ttf"),
     "Afacad": require("./assets/fonts/AfacadFlux-VariableFont_slnt,wght.ttf"),
@@ -60,11 +60,12 @@ const App: React.FC = () => {
         <Stack.Screen name="SecurityAwareness" component={SecurityAwarenessScreen} />
         <Stack.Screen name="OSINTsearch" component={OSINTsearch} />
         <Stack.Screen name="ScanHistory" component={ScanHistory} />
-        <Stack.Screen name="AdvancedScans" component={AdvancedScans} />
+
+        <Stack.Screen name="AdvancedScan" component={AdvancedScans} />
         <Stack.Screen name="WebAppScan" component={WebAppScan} />
-        <Stack.Screen name="HostDiscovery" component={HostDiscovery} />
         <Stack.Screen name="MalwareScan" component={MalwareScan} />
-        
+        <Stack.Screen name="HostDiscovery" component={HostDiscovery} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
