@@ -11,9 +11,12 @@ import BasicScanScreen from './screens/BasicScanScreen';
 import ViewReportsScreen from './screens/ViewReportsScreen';
 import SecurityAwarenessScreen from './screens/SecurityAwarenessScreen';
 import ScanHistory from './screens/ScanHistory';
-import AdvancedScan from './screens/AdvancedScan';
+import AdvancedScans from './screens/AdvancedScan';
 import OSINTsearch from './screens/OSINTsearch';
 import RegisterScreen from './screens/RegisterScreen';
+import HostDiscovery from './screens/HostDiscovery';
+import WebAppScan from './screens/WebAppScan';
+import MalwareScan from './screens/MalwareScan';
 
 // Define the types for our navigation parameters
 export type RootStackParamList = {
@@ -24,8 +27,11 @@ export type RootStackParamList = {
   ViewReports: undefined;
   SecurityAwareness: undefined;
   ScanHistory: undefined;
-  AdvancedScan: undefined;
+  AdvancedScans: undefined;
   OSINTsearch: undefined;
+  MalwareScan: undefined;
+  HostDiscovery: undefined;
+  WebAppScan: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -44,7 +50,7 @@ const App: React.FC = () => {
   return (
 
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
+      <Stack.Navigator initialRouteName="Home">
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
@@ -54,7 +60,11 @@ const App: React.FC = () => {
         <Stack.Screen name="SecurityAwareness" component={SecurityAwarenessScreen} />
         <Stack.Screen name="OSINTsearch" component={OSINTsearch} />
         <Stack.Screen name="ScanHistory" component={ScanHistory} />
-        <Stack.Screen name="AdvancedScan" component={AdvancedScan} />
+        <Stack.Screen name="AdvancedScans" component={AdvancedScans} />
+        <Stack.Screen name="WebAppScan" component={WebAppScan} />
+        <Stack.Screen name="HostDiscovery" component={HostDiscovery} />
+        <Stack.Screen name="MalwareScan" component={MalwareScan} />
+        
       </Stack.Navigator>
     </NavigationContainer>
   );
