@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, ScrollView} from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useFonts } from 'expo-font';
 import { RootStackParamList } from '../App';
@@ -22,10 +22,11 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
  
   return (
     <View className="flex p-5 items-center">
+      <ScrollView>
       <View className="flex-col justify-between items-center w-full ">
         <Text style={{ fontFamily: "Vercel-semi", fontSize: 40 }} className="text-center">Security Scanner</Text>
       </View>
-      <Text style={{ fontFamily: "Vercel-semi", fontSize: 25 }} className="text-xl font-bold mb-1 text-gray-700" >Tools</Text>
+      <Text style={{ fontFamily: "Vercel-semi", fontSize: 25 }} className="text-xl font-bold mb-1 text-gray-700 text-center" >Tools</Text>
       <View className="flex-row flex-wrap justify-around">
         {scanTools.map((tool, index) => (
           <TouchableOpacity
@@ -38,6 +39,7 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
           </TouchableOpacity>
         ))}
       </View>
+      </ScrollView>
     </View>
   );
 };
