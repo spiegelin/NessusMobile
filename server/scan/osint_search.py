@@ -4,6 +4,10 @@ import os
 import sys
 import socket
 import asyncio
+from socket import gaierror
+import aiohttp
+from typing import Optional
+import httpx
 
 # Load the environment variables
 load_dotenv()
@@ -17,66 +21,77 @@ DEHASHED_API_KEY = os.getenv("API_KEY_DEHASHED")
 DEHASHED_USERNAME = os.getenv("USERNAME_DEHASHED")
 
 
-async def shodan_scan(ip_or_domain: str):
-    # Resolve the domain to an IP address (if given a domain)
-    ip_address = resolve_domain(ip_or_domain)
+async def shodan_scan(ip_or_domain: str) -> Optional[dict]:
+    """
+    Perform a Shodan scan asynchronously to gather OSINT information.
+    :param ip_or_domain: The IP address or domain to scan.
+    :return: A dictionary containing OSINT information or a message if no vulnerabilities are found.
+    """
+    ip_address = ip_or_domain
+    if not ip_or_domain.replace('.', '').isdigit():  # Check if it's a domain
+        ip_address = await resolve_domain(ip_or_domain)
+
     print("IP: ", ip_address)
 
-    # Searcg OSINT info from Shodan
     internetdb_url = f"https://internetdb.shodan.io/{ip_address}"
     geonet_url = f"https://geonet.shodan.io/api/ping/{ip_address}"
-    try:
-        # Obtain open ports, hosts and vulns from the InternetDB API
-        response = requests.get(internetdb_url)
-        host_info = response.json()
 
-        # Obtain geolocation information from the GeoNet API
-        response = requests.get(geonet_url)
-        geonet_info = response.json()
+    async with aiohttp.ClientSession() as session:
+        try:
+            # Fetch host info from InternetDB API
+            async with session.get(internetdb_url) as response:
+                host_info = await response.json()
 
-        # Check if the host has vulnerabilities
-        if "vulns" in host_info:
-            print("Vulns: ", host_info["vulns"])
-            cve_list = host_info["vulns"]
+            # Fetch geolocation info from GeoNet API
+            async with session.get(geonet_url) as response:
+                geonet_info = await response.json()
+
             vulnerabilities_info = []
 
-            # Obtain information about each vulnerability from the CVE DB API
-            for cve_id in cve_list:
-                cve_info_url = f"https://cvedb.shodan.io/cve/{cve_id}"
-                cve_response = requests.get(cve_info_url)
-                cve_info = cve_response.json()
+            # Check if the host has vulnerabilities
+            if "vulns" in host_info:
+                print("Vulns: ", host_info["vulns"])
+                cve_list = host_info["vulns"]
 
-                vulnerability_details = {
-                    "cve_id": cve_info.get("cve_id"),
-                    "cvss": cve_info.get("cvss"),
-                    "published_time": cve_info.get("published_time"),
-                    "summary": cve_info.get("summary")
+                for cve_id in cve_list:
+                    cve_info_url = f"https://cvedb.shodan.io/cve/{cve_id}"
+                    async with session.get(cve_info_url) as cve_response:
+                        cve_info = await cve_response.json()
+                        vulnerability_details = {
+                            "cve_id": cve_info.get("cve_id"),
+                            "cvss": cve_info.get("cvss"),
+                            "published_time": cve_info.get("published_time"),
+                            "summary": cve_info.get("summary")
+                        }
+                        vulnerabilities_info.append(vulnerability_details)
+
+                return {
+                    "ip": host_info.get("ip"),
+                    "hostnames": host_info.get("hostnames"),
+                    "ports": host_info.get("ports"),
+                    "city": geonet_info.get("from_loc").get("city"),
+                    "country": geonet_info.get("from_loc").get("country"),
+                    "latlon": geonet_info.get("from_loc").get("latlon"),
+                    "vulnerabilities": vulnerabilities_info
                 }
+            else:
+                return {"message": "No vulnerabilities found for this IP address."}
 
-                vulnerabilities_info.append(vulnerability_details)
+        except aiohttp.ClientError as e:
+            raise Exception(f"Failed to perform Shodan scan: {e}")
 
-            return {
-                "ip": host_info.get("ip"),
-                "hostnames": host_info.get("hostnames"),
-                "ports": host_info.get("ports"),
-                "city": geonet_info.get("from_loc").get("city"),
-                "country": geonet_info.get("from_loc").get("country"),
-                "latlon": geonet_info.get("from_loc").get("latlon"),
-                "vulnerabilities": vulnerabilities_info
-            }
-        else:
-            return {"message": "No vulnerabilities found for this IP address."}
-
-    except Exception as e:
-        raise Exception(status_code=500, detail=str(e))
 
 async def socials_discovery(domain: str):
-    # Search for emails and social media profiles using the Hunter API
+    """
+    Discovers social media profiles, emails, and other organizational information 
+    using the Hunter API asynchronously.
+    """
     hunter_url = f"{HUNTER_URL}/domain-search?domain={domain}&api_key={HUNTER_API_KEY}"
     try:
-        response = requests.get(hunter_url)
-        response.raise_for_status()  # Verifies if the request was successful
-        hunter_info = response.json()
+        async with httpx.AsyncClient() as client:
+            response = await client.get(hunter_url)
+            response.raise_for_status()  # Verifies if the request was successful
+            hunter_info = response.json()
 
         employees_dict = {}
         for email_entry in hunter_info.get('data', {}).get('emails', []):
@@ -102,10 +117,10 @@ async def socials_discovery(domain: str):
             # Add email and sources to the employee
             employees_dict[employee_key]["emails"].append(email_entry.get('value'))
             employees_dict[employee_key]["sources"].extend(email_entry.get('sources', []))
-        
+
         # Convert the dictionary to a list
         employees_list = list(employees_dict.values())
-       
+
         return {
             "organization_info": {
                 "domain": hunter_info.get("data").get("domain"),
@@ -129,10 +144,13 @@ async def socials_discovery(domain: str):
             "total": hunter_info.get("meta").get("results")
         }
     except Exception as e:
-        raise Exception(status_code=500, detail=str(e))
+        raise Exception(f"Error: {str(e)}")
+
 
 async def find_passwords(email: str):
-    # Search for passwords and hashes using the Dehashed API
+    """
+    Search for passwords and hashes using the Dehashed API asynchronously.
+    """
     url = f"https://api.dehashed.com/search?query={email}"
 
     # Prepare the headers for Basic Authentication
@@ -141,26 +159,36 @@ async def find_passwords(email: str):
     }
 
     try:
-        response = requests.get(url, headers=headers, auth=(DEHASHED_USERNAME, DEHASHED_API_KEY))
-        # Check for successful response
-        if response.status_code == 200:
-            print(response)
-            data = response.json()
-            print(data)
-            return data
-        else:
-            print(f"Error: {response.status_code}, {response.text}")
-    except Exception as e:
-        raise Exception(status_code=500, detail=str(e))
+        # Use an async client for the request
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, headers=headers, auth=(DEHASHED_USERNAME, DEHASHED_API_KEY))
 
+            # Check for successful response
+            if response.status_code == 200:
+                data = response.json()
+                print(data)
+                return data
+            else:
+                print(f"Error: {response.status_code}, {response.text}")
+                return {"error": response.status_code, "message": response.text}
 
-def resolve_domain(domain: str):
-    """Resolves a domain to an IP address using socket"""
+    except httpx.RequestError as e:
+        # Handle request errors
+        raise Exception(f"An error occurred while making the request: {str(e)}")
+
+async def resolve_domain(domain: str) -> str:
+    """
+    Resolves a domain to an IP address asynchronously using asyncio and getaddrinfo.
+    :param domain: The domain to resolve.
+    :return: The resolved IP address as a string.
+    """
     try:
-        ip = socket.gethostbyname(domain)
-        return ip
-    except socket.gaierror:
-        raise Exception(status_code=400, detail="Invalid domain or unable to resolve")
+        loop = asyncio.get_event_loop()
+        result = await loop.getaddrinfo(domain, None)
+        return result[0][4][0]  # Extract the resolved IP address from the result
+    except gaierror:
+        raise Exception("Invalid domain or unable to resolve")
+    
     
 async def main(ip_or_domain, domain, email):
     # Ejecutar las funciones asincrónicamente y en paralelo
