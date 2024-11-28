@@ -98,7 +98,8 @@ async def scan(target: Target, scan_type: str = Query(..., description="Type of 
         # Call the scan function with the target and scan type
         # Only accepts an IP or IP range
         if ipaddress.ip_network(target.target, strict=False):
-            print("Scanning target: ", target.target)
+            target = [target.target]
+            print("Scanning target: ", target)
             scan_data = openvas_scan(target, scan_type)
             return scan_data
         else:
