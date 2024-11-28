@@ -9,29 +9,29 @@ async def generate_solution(scan_id, vulnerability):
     if scan_id == 1:
         # Si el scan_id es 1, incluimos los campos cwe_id, alert, riskdesc y desc
         prompt = f"""
-        La siguiente vulnerabilidad fue detectada durante un análisis de seguridad en un sitio web:
+        The following vulnerability was detected during a security analysis of a website:
 
         - CWE ID: {vulnerability['cwe_id']}
-        - Vulnerabilidad: {vulnerability['alert']}
-        - Nivel de Riesgo: {vulnerability['riskdesc']}
-        - Descripción: {vulnerability['desc']}
+        - Vulnerability: {vulnerability['alert']}
+        - Risk Level: {vulnerability['riskdesc']}
+        - Description: {vulnerability['desc']}
 
-        Por favor, proporciona una recomendación detallada en español para mitigar esta vulnerabilidad de forma efectiva.
+        Please provide a detailed recommendation in English to effectively mitigate this vulnerability.
         
-        Pero por favor intenta que sea en un par de líneas máximo 3 renglones, no hagas párrafos enormes, ni listas, ni nada, solo texto puro.
+        Please make sure it fits in just a couple of lines, at most 3 lines, and avoid large paragraphs, lists, or any other structure. Just plain text.
         """
     elif scan_id == 2:
         # Si el scan_id es 2, incluimos los campos desc, cve_id y cvss
         prompt = f"""
-        La siguiente vulnerabilidad fue detectada durante un análisis de seguridad en un sitio web:
+        The following vulnerability was detected during a security analysis of a website:
 
         - CVE ID: {vulnerability['cve_id']}
-        - Nivel CVSS: {vulnerability['cvss']}
-        - Descripción: {vulnerability['desc']}
+        - CVSS Score: {vulnerability['cvss']}
+        - Description: {vulnerability['desc']}
 
-        Por favor, proporciona una recomendación detallada en español para mitigar esta vulnerabilidad de forma efectiva.
+        Please provide a detailed recommendation in English to effectively mitigate this vulnerability.
         
-        Pero por favor intenta que sea en un par de líneas máximo 3 renglones, no hagas párrafos enormes, ni listas, ni nada, solo texto puro.
+        Please make sure it fits in just a couple of lines, at most 3 lines, and avoid large paragraphs, lists, or any other structure. Just plain text.
         """
     else:
         # Si el scan_id no es válido, retornamos None
@@ -41,7 +41,7 @@ async def generate_solution(scan_id, vulnerability):
         response = await openai.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
-                {"role": "system", "content": "Eres un asistente experto en ciberseguridad."},
+                {"role": "system", "content": "You are an expert cybersecurity assistant."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=600,
