@@ -12,10 +12,10 @@ type AdvancedScanProps = {
 
 const OSINT = ({ navigation }: AdvancedScanProps) => {
   const advancedScanTools = [
-    { name: 'Passwords' , image : require('../assets/bancoCogs.jpg') , desc : "discord" },
-    { name: 'Socials', image: require('../assets/bancoCogs.jpg') ,desc : "discord"},
-    { name: 'Crawl', image: require('../assets/bancoCogs.jpg') , desc : "discord"},
-    { name: 'Shodan', image: require('../assets/bancoCogs.jpg') , desc : "discord"},
+    { name: 'Passwords' , image : require('../assets/bancoCogs.jpg') , desc : "Investigates data leaks, dark web information, and data breaches through OSINT methods relevant to a domain. Checks for compromised enterprises and affected passwords." },
+    { name: 'Socials', image: require('../assets/bancoCogs.jpg') ,desc : "Finds a domain's information such as social networks linked to the company, employees, employee positions, sectors, company tech stack, company description, etc."},
+    { name: 'Crawl', image: require('../assets/bancoCogs.jpg') , desc : "Generates a map site of the target domain to learn the components of the site and the relationships between them. It finds all links that can access the target domain."},
+    { name: 'Shodan', image: require('../assets/bancoCogs.jpg') , desc: "Utilizes Shodan's API to discover vulnerabilities in the target domain. Shodan is a search engine for internet-connected devices, providing details on associated CVEs, open ports, server locations, hostnames, and more." }
    
   ];
  

@@ -14,7 +14,7 @@ const Shodan = () => {
     <View className="flex-1 p-5">
       <View className="flex-col justify-between items-center w-full mb-6">
         
-      <Text style={{ fontFamily: 'Vercel-semi', fontSize: 43 }} className="mt-20 mb-5 text-center">Basic Scan</Text>
+      <Text style={{ fontFamily: 'Vercel-semi', fontSize: 50 }} className="mt-20 mb-5 text-center">Shodan Scan</Text>
       </View>
       <TextInput className="w-full h-10 border border-gray-400 rounded mb-3 px-3" placeholder="URL or IP to scan" />
       <TouchableOpacity className="bg-black p-3 rounded-lg">
