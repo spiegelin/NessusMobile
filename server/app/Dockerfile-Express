@@ -1,23 +1,23 @@
-# Usa una imagen base de Node.js
 FROM node:16
 
-# Configura el directorio de trabajo para la aplicación
+# Configurar el directorio de trabajo
 WORKDIR /app
 
-# Copia los archivos necesarios para instalar las dependencias
-COPY . /app
+# Copiar únicamente package.json y package-lock.json (optimización de cache)
+COPY package.json package-lock.json ./
 
-# Instala las dependencias de la aplicación
+# Borra la carpeta node_modules (en caso de que exista)
+RUN rm -rf node_modules
+
+# Instala las dependencias de nuevo
 RUN npm install
 
-# Instala Prisma como una dependencia de desarrollo
-RUN npm install prisma --save-dev
+# Copiar el resto de los archivos
+COPY . .
 
-# Ejecuta el comando para generar el esquema de Prisma
+# Ejecutar Prisma y exponer el puerto
 RUN npx prisma generate
-
-# Expón el puerto 3000 (puerto donde escucha la app de Express)
 EXPOSE 3000
 
-# Comando para ejecutar la aplicación
+# Comando para iniciar la aplicación
 CMD ["node", "main.js"]
