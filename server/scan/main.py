@@ -115,6 +115,11 @@ async def web_scan(target: Target):
         return scan_data
     except Exception as e:
         return {"error": str(e)}
+    
+@app.post("/process-link")
+async def process_link(link: str):
+    # Process the link here
+    return {"message": f"Processing {link}"}
 
 # Load environment variables and start the server
 if __name__ == "__main__":
