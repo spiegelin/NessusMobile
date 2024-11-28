@@ -7,7 +7,7 @@ import { useFonts } from 'expo-font';
 import { RootStackParamList } from '../App';
 
 
-const BasicScanScreen = () => {
+const Shodan = () => {
   
   const [scan, setScan] = useState('');
   return (
@@ -28,4 +28,4 @@ const BasicScanScreen = () => {
   )
 };
 
-export default BasicScanScreen;
+export default Shodan;
