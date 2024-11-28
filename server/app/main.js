@@ -1,6 +1,6 @@
 const express = require('express');
 const { PrismaClient } = require('@prisma/client');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const app = express();
@@ -86,6 +86,23 @@ app.get('/log', authenticateToken, async (req, res) => {
   } catch (error) {
     console.error('Error details:', error);
     res.status(400).json({ error: error.message });
+  }
+});
+
+app.post('/process-link', async (req, res) => {
+  const { link } = req.body;
+
+  // Send the link to FastAPI for processing
+  try {
+    const response = await axios.post('http://scan-controller:8000/process-link', { link });
+
+    res.status(200).json({
+      message: `Processed link: ${link}`,
+      fastapi_response: response.data,
+    });
+  } catch (error) {
+    console.error('Error calling FastAPI:', error);
+    res.status(500).json({ error: 'Failed to process the link' });
   }
 });
 
