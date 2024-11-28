@@ -10,6 +10,7 @@ type HomeScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, 'Home'>;
 };
 
+
 const HomeScreen = ({ navigation }: HomeScreenProps) => {
   const scanTools = [
     { name: 'Basic Scan', image: require('../assets/bancoLifeline2.png') , desc: "Perform a quick vulnerability scan for immediate insights." },
@@ -19,10 +20,16 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
     { name: 'Scan History', image: require('../assets/bancoHistory.png') , desc : "Review past scans and track security trends over time."},
     { name: 'Security Awareness', image: require('../assets/bancoSecurityAware.png') , desc : "Learn best practices to strengthen your security posture." },
   ];
- 
+  const [api , setApi] = useState('');
+
+
   return (
     <View className="flex p-5 items-center">
       <ScrollView>
+        
+          <Text>Enter API Key</Text>
+          <TextInput className="w-full h-10 border border-gray-400 rounded mb-3 px-3" onChangeText={(text) => setApi(text)} />
+        
       <View className="flex-col justify-between items-center w-full ">
         <Text style={{ fontFamily: "Vercel-semi", fontSize: 40 }} className="text-center">Security Scanner</Text>
       </View>

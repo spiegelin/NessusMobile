@@ -7,7 +7,7 @@ import { useFonts } from 'expo-font';
 import { RootStackParamList } from '../App';
 
 
-const BasicScanScreen: React.FC = () => {
+const BasicScanScreen = () => {
   
 
   return (

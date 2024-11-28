@@ -7,7 +7,7 @@ import { useFonts } from 'expo-font';
 import { RootStackParamList } from '../App';
 
 type AdvancedScanProps = {
-  navigation: StackNavigationProp<RootStackParamList, 'AdvancedScans'>;
+  navigation: StackNavigationProp<RootStackParamList, 'AdvancedScan'>;
 };
 
 const AdvancedScans = ({ navigation }: AdvancedScanProps) => {
