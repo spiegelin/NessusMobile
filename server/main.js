@@ -92,7 +92,7 @@ app.get('/log', authenticateToken, async (req, res) => {
 app.post('/scan', authenticateToken, async (req, res) => {
   const { url_or_ip } = req.body;
 
-  try {
+  try { 
     const log = await prisma.log.create({
       data: { url_or_ip },
     });
