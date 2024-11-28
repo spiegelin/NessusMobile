@@ -15,25 +15,6 @@ from ai_sol import process_vulnerabilities
 
 app = FastAPI()
 
-"""
-@app.post("/scan")
-async def perform_scan(target: str):
-    try:
-        scan_id = create_nessus_scan(target)
-        return {"message": "Scan initiated", "scan_id": scan_id}
-    except Exception as e:
-        return {"error": str(e)}
-
-@app.get("/scan/{scan_id}")
-async def get_report(scan_id: int):
-    try:
-        report = get_nessus_scan_report(scan_id)
-        recommendations = get_vulnerability_recommendations(report)
-        return {"vulnerabilities": report, "recommendations": recommendations}
-    except Exception as e:
-        return {"error": str(e)}
-"""
-
 # Health check GET endpoint
 @app.get("/health")
 async def health():
