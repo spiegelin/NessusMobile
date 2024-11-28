@@ -38,7 +38,7 @@ async def generate_solution(scan_id, vulnerability):
         return None
     
     try:
-        response = await openai.chat.completions.create(
+        response = openai.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are an expert cybersecurity assistant."},
