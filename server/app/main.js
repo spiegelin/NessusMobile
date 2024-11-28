@@ -118,7 +118,7 @@ app.post('/process-link', async (req, res) => {
   const { target } = req.body;
 
   try {
-    const response = await fetch('http://scan-controller:8000/process-link/', {
+    const response = await fetch('http://scan-controller:8000/socials/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
