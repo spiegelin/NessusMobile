@@ -4,33 +4,18 @@ from osint_search import shodan_scan, socials_discovery, find_passwords
 import uvicorn
 import os
 from pydantic import BaseModel
+from typing import Optional
 from Spider import crawl_website
 from openvas_scanner import openvas_scan
 from zap_scanner import zap_scan
+from ai_sol import process_vulnerabilities
+import re
+import ipaddress
 
 # uvicorn main:app --reload
 
 
 app = FastAPI()
-
-"""
-@app.post("/scan")
-async def perform_scan(target: str):
-    try:
-        scan_id = create_nessus_scan(target)
-        return {"message": "Scan initiated", "scan_id": scan_id}
-    except Exception as e:
-        return {"error": str(e)}
-
-@app.get("/scan/{scan_id}")
-async def get_report(scan_id: int):
-    try:
-        report = get_nessus_scan_report(scan_id)
-        recommendations = get_vulnerability_recommendations(report)
-        return {"vulnerabilities": report, "recommendations": recommendations}
-    except Exception as e:
-        return {"error": str(e)}
-"""
 
 # Health check GET endpoint
 @app.get("/health")
@@ -46,11 +31,23 @@ async def health():
 class Target(BaseModel):
     target: str
 
+class OpenAIData(BaseModel):
+    scan_id: int
+    cwe_id: Optional[str] = None 
+    alert: Optional[str] = None 
+    riskdesc: Optional[str] = None
+    desc: Optional[str] = None
+    cve_id: Optional[str] = None
+    cvss: Optional[float] = None
+
 # Get OSINT information about a target
 @app.get("/osint")
 async def osint(target: Target):
     try:
-        osint_data = await shodan_scan(target.target)
+        # Accepts an IP or a domain
+        target = validate_target(target.target, "ip_or_domain")
+        print("Starting Shodan scan for: ", target)
+        osint_data = await shodan_scan(target)
         return osint_data
     except Exception as e:
         return {"error": str(e)}
@@ -59,7 +56,10 @@ async def osint(target: Target):
 @app.post("/socials")
 async def socials(target: Target):
     try:
-        socials_data = await socials_discovery(target.target)
+        # Only accepts a domain
+        target = validate_target(target.target, "domain")
+        print("Starting Socials Scan for: ", target)
+        socials_data = await socials_discovery(target)
         return socials_data
     except Exception as e:
         return {"error": str(e)}
@@ -77,14 +77,10 @@ async def passwords(target: Target):
 @app.post("/crawl")
 async def crawl(target: Target):
     try:
-        print("----------------------------------------------------------------------")
-        print("Crawling website...")
-        print("Target: ", target.target)
-        print("Remember this is an ACTIVE recon technique and may be illegal!!!!")
-        print("----------------------------------------------------------------------")
+        # Only accepts a URL
+        target = validate_target(target.target, "url")
+        print("Starting to crawl website: ", target)
         crawled_data = await crawl_website(target.target)
-        print("*******Finished crawling website*******")
-        print("Crawled data: ", crawled_data)
         return crawled_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -100,8 +96,14 @@ async def scan(target: Target, scan_type: str = Query(..., description="Type of 
     """
     try:
         # Call the scan function with the target and scan type
-        scan_data = await openvas_scan(target.target, scan_type)
-        return scan_data
+        # Only accepts an IP or IP range
+        if ipaddress.ip_network(target.target, strict=False):
+            target = [target.target]
+            print("Scanning target: ", target)
+            scan_data = openvas_scan(target, scan_type)
+            return scan_data
+        else:
+            raise HTTPException(status_code=400, detail="El target debe ser una IP o rango de IP válido.")
     except Exception as e:
         # Return an error response in case of an exception
         return {"error": str(e)}
@@ -110,8 +112,10 @@ async def scan(target: Target, scan_type: str = Query(..., description="Type of 
 @app.post("/web-scan")
 async def web_scan(target: Target):
     try:
-        # Perform the scan
-        scan_data = await zap_scan(target.target)
+        # Accepts a URL
+        target = validate_target(target.target, "url")
+        print("Starting ZAP scan for: ", target)
+        scan_data = await zap_scan(target)
         return scan_data
     except Exception as e:
         return {"error": str(e)}
@@ -120,6 +124,61 @@ async def web_scan(target: Target):
 async def process_link(link: str):
     # Process the link here
     return {"message": f"Processing {link}"}
+
+@app.post("/ai-solutions")
+async def ai_solutions(data: OpenAIData):
+    try:
+        data = data.dict()
+        # Process the vulnerabilities
+        processed_data = await process_vulnerabilities(data)
+        return {"success": True,  
+                "data": processed_data}
+    except Exception as e:
+        return {"error": str(e)}
+
+# Función auxiliar para validar y ajustar targets
+def validate_target(target: str, target_type: str) -> str:
+    """
+    Valida y ajusta el parámetro target según su tipo esperado.
+    """
+    def is_valid_ip(ip: str) -> bool:
+        ip_pattern = r"^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$"  # IPv4
+        return re.match(ip_pattern, ip) is not None
+
+    def is_valid_domain(domain: str) -> bool:
+        domain_pattern = r"^(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$"
+        return re.match(domain_pattern, domain) is not None
+
+    if target_type == "domain":
+        # Quitar protocolo si es una URL
+        if target.startswith("http://") or target.startswith("https://"):
+            target = target.split("//", 1)[-1].rstrip("/")
+        # Validar como dominio
+        if not is_valid_domain(target):
+            raise HTTPException(status_code=400, detail="El target debe ser un dominio válido.")
+        return target
+
+    if target_type == "ip_or_domain":
+        if target.startswith("http://") or target.startswith("https://"):
+            target = target.split("//", 1)[-1].rstrip("/")
+        # Validar IP o dominio
+        if is_valid_ip(target):
+            return target
+        if not is_valid_domain(target):
+            raise HTTPException(status_code=400, detail="El target debe ser una IP o dominio válido.")
+        return target
+    
+    if target_type == "url":
+        if target.startswith("http://") or target.startswith("https://"):
+            target = target.split("//", 1)[-1].rstrip("/")
+        
+        if is_valid_ip(target) or is_valid_domain(target):
+            return "https://" + target + "/"
+        else:
+            raise HTTPException(status_code=400, detail="El target debe ser una URL válida.")
+
+    # Si no hay un tipo definido
+    raise HTTPException(status_code=400, detail="Tipo de target no soportado.")
 
 # Load environment variables and start the server
 if __name__ == "__main__":

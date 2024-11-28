@@ -7,6 +7,7 @@ import time
 from dotenv import load_dotenv
 import os
 import json
+import xmltodict
 
 
 # CVE scanner_id: 6acd0832-df90-11e4-b9d5-28d24461215b
@@ -54,16 +55,32 @@ def connect_to_openvas():
 
 def create_target(gmp, name, hosts):
     """
-    Creates a target in OpenVAS.
+    Creates a target in OpenVAS if it does not already exist.
+    
+    If the target exists, returns its ID without creating a new one.
+    
+    :param gmp: An instance of the GMP object.
+    :param name: The name of the target.
+    :param hosts: The hosts associated with the target.
+    :return: The target ID or None if there was an error.
     """
     try:
         # Define a port list ID (you may want to adjust this if necessary)
         port_list_id = "4a4717fe-57d2-11e1-9a26-406186ea4fc5"  # Default port list in OpenVAS (replace if needed)
 
-        response = gmp.create_target(name=name, hosts=hosts, port_list_id=port_list_id)
+        # Check if the target already exists
+        targets_response = gmp.get_targets()
+        targets_xml = etree.fromstring(str(targets_response))  # Convert response to XML
 
-        # Debug log: Output the raw response
-        #print("[DEBUG] Target creation response:", pretty_print(response))
+        # Find a target with the same name
+        existing_target = targets_xml.xpath(f"//target[name='{name}']")
+        if existing_target:
+            target_id = existing_target[0].xpath('@id')[0]  # Get the ID attribute of the existing target
+            print(f"[INFO] Target '{name}' already exists with ID: {target_id}")
+            return target_id
+
+        # If the target does not exist, create it
+        response = gmp.create_target(name=name, hosts=hosts, port_list_id=port_list_id)
 
         # Parse the response into an XML tree
         response_xml = etree.fromstring(str(response))  # Convert string to XML element
@@ -72,9 +89,11 @@ def create_target(gmp, name, hosts):
         target_id = response_xml.xpath('//create_target_response/@id')[0]
         print(f"[INFO] Target '{name}' created with ID: {target_id}")
         return target_id
+
     except Exception as e:
         print(f"[ERROR] Failed to create target: {e}")
         return None
+
 
 
 def start_scan(gmp, name, target_id, scan_config_id, scanner_id):
@@ -129,14 +148,14 @@ def wait_for_scan_completion(gmp, task_id):
                 break
 
             # Wait and retry
-            time.sleep(30)
+            time.sleep(10)
 
         except Exception as e:
             print(f"[ERROR] Failed to retrieve task status: {e}")
             break
 
 
-def generate_report(gmp, task_id, output_file):
+def generate_report(gmp, task_id):
     """
     Generates a report for the given task and saves it to a file.
     """
@@ -162,10 +181,8 @@ def generate_report(gmp, task_id, output_file):
         report = gmp.get_report(report_id=report_id, report_format_id='c402cc3e-b531-11e1-9163-406186ea4fc5')  # Default XML format
 
         # Save the report to the specified output file
-        with open(output_file, 'w') as file:
-            file.write(report)
+        return report
         
-        print(f"[INFO] Report saved to {output_file}")
     except Exception as e:
         print(f"[ERROR] Failed to generate report: {e}")
 
@@ -180,45 +197,32 @@ def list_scan_configs(gmp):
     except Exception as e:
         print(f"[ERROR] Failed to retrieve scan configurations: {e}")
 
-def generate_report_json(gmp, task_id):
+def xml_to_json(xml_data):
     """
-    Genera un reporte en formato JSON para la tarea dada.
+    Convierte una cadena XML a JSON.
+    
+    :param xml_data: Cadena en formato XML.
+    :return: Una cadena en formato JSON.
     """
     try:
-        # Obtener información de la tarea
-        response = gmp.get_task(task_id=task_id)
-
-        # Parsear la respuesta en un objeto XML
-        response_xml = etree.fromstring(str(response))  # Convertir string a elemento XML
-
-        # Extraer el ID del reporte usando XPath
-        report_id_elements = response_xml.xpath("//last_report/report/@id")
-
-        if not report_id_elements:
-            print("[ERROR] No se encontró el ID del reporte.")
-            return {"error": "No se encontró el ID del reporte."}
+        # Convierte el XML a un diccionario de Python
+        dict_data = xmltodict.parse(xml_data)
         
-        report_id = report_id_elements[0]
-
-        # Obtener el reporte en formato JSON
-        # El formato de reporte debe soportar JSON; este es un ejemplo estándar
-        json_report_format_id = "a3810a62-1f62-11e1-9219-406186ea4fc5"  # ID del formato JSON
-        report = gmp.get_report(report_id=report_id, report_format_id=json_report_format_id)
-
-        # Convertir el reporte de string a objeto JSON
-        json_report = json.loads(str(report))
-
-        print("[INFO] Reporte generado exitosamente en formato JSON")
-        return json_report
+        # Convierte el diccionario a JSON
+        json_data = json.dumps(dict_data, indent=4)
+        
+        return json.loads(json_data)
     except Exception as e:
-        print(f"[ERROR] Error al generar el reporte JSON: {e}")
-        return {"error": str(e)}
+        print(f"[ERROR] Error al convertir XML a JSON: {e}")
+        return None
+
 
 
 def openvas_scan(ip, scan_type):
     try:
         # Connect to OpenVAS
         gmp = connect_to_openvas()
+        print("[INFO] Connected to OpenVAS")
         res = {}
 
         if scan_type == "host_discovery":
@@ -229,8 +233,9 @@ def openvas_scan(ip, scan_type):
                 discovery_task_id = start_scan(gmp, "Host Discovery", discovery_target_id, "2d3f051c-55ba-11e3-bf43-406186ea4fc5", DEFAULT_SCANNER_ID)
                 if discovery_task_id:
                     wait_for_scan_completion(gmp, discovery_task_id)
-                    report_json = generate_report_json(gmp, discovery_task_id)
-                    return report_json
+                    report_xml = generate_report(gmp, discovery_task_id)
+                    report = xml_to_json(report_xml)
+                    return report
                 else:
                     print("[ERROR] Host Discovery scan task creation failed.")
                     return {"error": "Fallo en la creación de la tarea de escaneo de descubrimiento de hosts."}
@@ -246,8 +251,9 @@ def openvas_scan(ip, scan_type):
                 basic_task_id = start_scan(gmp, "Basic Scan", basic_target_id, "daba56c8-73ec-11df-a475-002264764cea", DEFAULT_SCANNER_ID)
                 if basic_task_id:
                     wait_for_scan_completion(gmp, basic_task_id)
-                    report_json = generate_report_json(gmp, discovery_task_id)
-                    return report_json
+                    report_xml = generate_report(gmp, basic_task_id)
+                    report = xml_to_json(report_xml)
+                    return report
                 else:
                     print("[ERROR] Basic scan task creation failed.")
                     return {"error": "Fallo en la creación de la tarea de escaneo básico."}
@@ -263,8 +269,9 @@ def openvas_scan(ip, scan_type):
                 malware_task_id = start_scan(gmp, "Malware Scan", malware_target_id, "bbca7412-a950-11e3-9109-406186ea4fc5", DEFAULT_SCANNER_ID)
                 if malware_task_id:
                     wait_for_scan_completion(gmp, malware_task_id)
-                    report_json = generate_report_json(gmp, discovery_task_id)
-                    return report_json
+                    report_xml = generate_report(gmp, malware_task_id)
+                    report = xml_to_json(report_xml)
+                    return report
                 else:
                     print("[ERROR] Malware scan task creation failed.")
                     return {"error": "Fallo en la creación de la tarea de escaneo básico."}
@@ -292,7 +299,8 @@ if __name__ == "__main__":
             discovery_task_id = start_scan(gmp, "Host Discovery", discovery_target_id, "2d3f051c-55ba-11e3-bf43-406186ea4fc5", DEFAULT_SCANNER_ID)
             if discovery_task_id:
                 wait_for_scan_completion(gmp, discovery_task_id)
-                generate_report(gmp, discovery_task_id, "host_discovery_report.xml")
+                report_xml = generate_report(gmp, discovery_task_id, "host_discovery_report.xml")
+                report = xml_to_json(report_xml)
             else:
                 print("[ERROR] Host Discovery scan task creation failed.")
         else:
