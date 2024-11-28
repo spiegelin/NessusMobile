@@ -65,7 +65,7 @@ const LoginScreen = ({ navigation }: LoginScreenProps) => {
     }
 
     try {
-      const response = await axios.post(`http://127.0.0.1:3000/login`, { email, password });
+      const response = await axios.post(`http://10.0.2.2:3000/login`, { email, password });
       const token = response.data.token;
 
       if (token) {

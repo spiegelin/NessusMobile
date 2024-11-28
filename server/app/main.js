@@ -107,6 +107,13 @@ app.get('/test', (req, res) => {
   res.send('Server is working!');
 });
 
+app.get('/webappscan', (req, res) => {
+  const { input } = req.body; // Extract input from request body
+  console.log('Received input:', input);
+  res.status(200).send({ message: `You entered: ${input}` });
+});
+
+
 const PORT = process.env.PORTBACK || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

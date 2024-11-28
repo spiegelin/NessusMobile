@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, ScrollView} from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useFonts } from 'expo-font';
 import { RootStackParamList } from '../App';
@@ -12,20 +12,21 @@ type HomeScreenProps = {
 
 const HomeScreen = ({ navigation }: HomeScreenProps) => {
   const scanTools = [
-    { name: 'Basic Scan', image: require('../assets/bancoLifeline2.png') , desc : "ARBOLITERS GO"},
-    { name: 'Advanced Scan', image: require('../assets/bancoCogs.jpg') ,desc : "sample description bork chen"},
-    { name: 'OSINT search', image: require('../assets/bancoWeb.png') , desc : "sample description bork chen"},
-    { name: 'View Reports', image: require('../assets/bancoReports4.png') , desc : "sample description bork chen"},
-    { name: 'Scan History', image: require('../assets/bancoHistory.png') , desc : "sample description bork chen"},
-    { name: 'Security Awareness', image: require('../assets/bancoSecurityAware.png') , desc : "sample description bork chen"},
+    { name: 'Basic Scan', image: require('../assets/bancoLifeline2.png') , desc: "Perform a quick vulnerability scan for immediate insights." },
+    { name: 'Advanced Scan', image: require('../assets/bancoCogs.jpg') ,desc : "Dive deeper into vulnerabilities with customizable scan settings."},
+    { name: 'OSINT search', image: require('../assets/bancoWeb.png') , desc : "Gather publicly available data to enhance threat analysis." },
+    { name: 'View Reports', image: require('../assets/bancoReports4.png') , desc : "Access detailed scan reports for review and decision-making." },
+    { name: 'Scan History', image: require('../assets/bancoHistory.png') , desc : "Review past scans and track security trends over time."},
+    { name: 'Security Awareness', image: require('../assets/bancoSecurityAware.png') , desc : "Learn best practices to strengthen your security posture." },
   ];
  
   return (
     <View className="flex p-5 items-center">
+      <ScrollView>
       <View className="flex-col justify-between items-center w-full ">
         <Text style={{ fontFamily: "Vercel-semi", fontSize: 40 }} className="text-center">Security Scanner</Text>
       </View>
-      <Text style={{ fontFamily: "Vercel-semi", fontSize: 25 }} className="text-xl font-bold mb-1 text-gray-700" >Tools</Text>
+      <Text style={{ fontFamily: "Vercel-semi", fontSize: 25 }} className="text-xl font-bold mb-1 text-gray-700 text-center" >Tools</Text>
       <View className="flex-row flex-wrap justify-around">
         {scanTools.map((tool, index) => (
           <TouchableOpacity
@@ -38,6 +39,7 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
           </TouchableOpacity>
         ))}
       </View>
+      </ScrollView>
     </View>
   );
 };
