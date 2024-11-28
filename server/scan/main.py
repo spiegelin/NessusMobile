@@ -4,9 +4,11 @@ from osint_search import shodan_scan, socials_discovery, find_passwords
 import uvicorn
 import os
 from pydantic import BaseModel
+from typing import Optional
 from Spider import crawl_website
 from openvas_scanner import openvas_scan
 from zap_scanner import zap_scan
+from ai_sol import process_vulnerabilities
 
 # uvicorn main:app --reload
 
@@ -45,6 +47,15 @@ async def health():
 # Model for the request body
 class Target(BaseModel):
     target: str
+
+class OpenAIData(BaseModel):
+    scan_id: int
+    cwe_id: Optional[str] = None 
+    alert: Optional[str] = None 
+    riskdesc: Optional[str] = None
+    desc: Optional[str] = None
+    cve_id: Optional[str] = None
+    cvss: Optional[float] = None
 
 # Get OSINT information about a target
 @app.get("/osint")
@@ -100,7 +111,8 @@ async def scan(target: Target, scan_type: str = Query(..., description="Type of 
     """
     try:
         # Call the scan function with the target and scan type
-        scan_data = await openvas_scan(target.target, scan_type)
+        print("Scanning target: ", target.target)
+        scan_data = openvas_scan(target.target, scan_type)
         return scan_data
     except Exception as e:
         # Return an error response in case of an exception
@@ -120,6 +132,17 @@ async def web_scan(target: Target):
 async def process_link(link: str):
     # Process the link here
     return {"message": f"Processing {link}"}
+
+@app.post("/ai-solutions")
+async def ai_solutions(data: OpenAIData):
+    try:
+        data = data.dict()
+        # Process the vulnerabilities
+        processed_data = await process_vulnerabilities(data)
+        return {"success": True,  
+                "data": processed_data}
+    except Exception as e:
+        return {"error": str(e)}
 
 # Load environment variables and start the server
 if __name__ == "__main__":
