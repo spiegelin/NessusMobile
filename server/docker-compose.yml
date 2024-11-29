@@ -41,6 +41,8 @@ services:
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - app-network
+    env_file:
+      - .env
   
   zap-scanner:
     image: zaproxy/zap-stable

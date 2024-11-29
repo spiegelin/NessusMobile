@@ -11,6 +11,14 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret'; // Use an enviro
 
 app.use(express.json());
 
+//Test route
+
+app.get('/test', (req, res) => {
+  res.send('Server is working!');
+});
+
+//Seccion de inicio de usuarios
+
 // New user registration
 app.post('/register', async (req, res) => {
   const { username, email, password } = req.body;
@@ -54,10 +62,10 @@ app.post('/login', async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
+      { userId: user.user_id, email: user.email },
       JWT_SECRET,
       { expiresIn: '1h' }
-    );
+  );  
 
     res.status(200).json({ message: 'Login successful', token });
   } catch (error) {
@@ -71,11 +79,12 @@ function authenticateToken(req, res, next) {
   const token = req.headers['authorization']?.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'Access token required' });
 
-  jwt.verify(token, JWT_SECRET, (error, user) => {
-    if (error) return res.status(403).json({ error: 'Invalid or expired token' });
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+      if (err) return res.status(403).json({ error: 'Invalid or expired token' });
 
-    req.user = user;
-    next();
+      // Attach userId from the token to the request
+      req.user = { userId: user.userId };
+      next();
   });
 }
 
@@ -90,23 +99,6 @@ app.get('/log', authenticateToken, async (req, res) => {
   }
 });
 
-app.post('/scan', authenticateToken, async (req, res) => {
-  const { url_or_ip } = req.body;
-
-  try {
-    const log = await prisma.log.create({
-      data: { url_or_ip },
-    });
-    res.status(201).json({ message: 'Scan added successfully', log });
-  } catch (error) {
-    console.error('Error details:', error);
-    res.status(400).json({ error: error.message });
-  }
-});
-
-app.get('/test', (req, res) => {
-  res.send('Server is working!');
-});
 
 app.get('/webappscan', (req, res) => {
   const { input } = req.body; // Extract input from request body
@@ -114,16 +106,24 @@ app.get('/webappscan', (req, res) => {
   res.status(200).send({ message: `You entered: ${input}` });
 });
 
-app.post('/process-link', async (req, res) => {
+//procesar el link para SOCIALS
+
+app.post('/process-link', authenticateToken, async (req, res) => {
   const { target } = req.body;
 
   try {
+    // Ensure userId is available from the token
+    const userId = req.user?.userId; // Extract userId from token
+
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is missing from the token' });
+    }
+
+    // Fetch data from the external API
     const response = await fetch('http://scan-controller:8000/socials/', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ target: target }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target }),
     });
 
     if (!response.ok) {
@@ -131,9 +131,21 @@ app.post('/process-link', async (req, res) => {
     }
 
     const data = await response.json();
+
+    // Save the scan results to the database using Prisma
+    const savedScan = await prisma.scan.create({
+      data: {
+        url_or_ip: target,
+        scan_type: 'active',
+        scan_results: data, // Save the API results
+        user_id: userId,    // Link the scan to the authenticated user
+      },
+    });
+
     res.status(200).json({
       message: `Processed link: ${target}`,
       fastapi_response: data,
+      savedScan,
     });
   } catch (error) {
     console.error('Error posting the link:', error);
@@ -141,6 +153,36 @@ app.post('/process-link', async (req, res) => {
   }
 });
 
+//GET SOCIALS
+
+app.get('/scans', authenticateToken, async (req, res) => {
+  try {
+    const scans = await prisma.scan.findMany({
+      include: {
+        user: {
+          select: {
+            username: true,
+            email: true,
+          },
+        },
+        report: true,
+        vulnerabilities: {
+          include: {
+            vulnerability: true,
+          },
+        },
+      },
+    });
+
+    res.status(200).json({ message: 'Scans retrieved successfully', scans });
+  } catch (error) {
+    console.error('Error details:', error);
+    res.status(400).json({ error: error.message });
+  }
+});
+
+
+//INICIAR EL SERVIDOR
 const PORT = process.env.PORTBACK || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
