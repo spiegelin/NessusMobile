@@ -19,6 +19,8 @@ model User {
   scans         Scan[]
   roles         UserRoles[]
   apiKeys       ApiKey[]
+  otp           String?
+  otpexpiry     DateTime?
 }
 
 model Role {

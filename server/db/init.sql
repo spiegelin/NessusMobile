@@ -5,7 +5,9 @@ CREATE TABLE "User" (
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    last_login TIMESTAMP
+    last_login TIMESTAMP,
+    otp VARCHAR(255),
+    otpexpiry TIMESTAMP
 );
 
 -- Create the Role table

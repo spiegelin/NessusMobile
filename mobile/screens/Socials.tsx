@@ -21,7 +21,7 @@ const Socials = () => {
       }
 
       const response = await axios.post(
-        'http://10.0.2.2:3000/process-link',
+        'http://localhost:3000/process-link',
         { target: input },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -58,7 +58,7 @@ const Socials = () => {
         onPress={handleScan}
         disabled={loading}
       >
-        <Text className="text-white text-center">
+        <Text style={{fontFamily: 'Vercel-semi'}} className="text-white text-center">
           {loading ? 'Scanning...' : 'Start Scan'}
         </Text>
       </TouchableOpacity>
@@ -75,9 +75,9 @@ const Socials = () => {
       {result && (
         <ScrollView className="mt-6 bg-gray-100 rounded-lg flex-1 p-3">
           {/* Organization Info */}
-          <Text className="text-lg font-bold text-center mb-4">{`Organization: ${result.organization_info.name}`}</Text>
+          <Text style={{fontFamily: 'Vercel-semi', fontSize: 30}} className="">{`Organization: ${result.organization_info.name}`}</Text>
           <View className="mb-5">
-            <Text className="text-xl font-bold">General Information</Text>
+            <Text style={{fontFamily: 'Vercel-semi', fontSize: 25}} className="">General Information</Text>
             <Text>{`Domain: ${result.organization_info.domain}`}</Text>
             <Text>{`Description: ${result.organization_info.description}`}</Text>
             <Text>{`Industry: ${result.organization_info.industry}`}</Text>
@@ -87,23 +87,23 @@ const Socials = () => {
             <Text>{`State: ${result.organization_info.state || 'N/A'}`}</Text>
             <Text>{`Street: ${result.organization_info.street || 'N/A'}`}</Text>
 
-            <Text className="font-semibold mt-2">Socials:</Text>
-            <Text>{`Twitter: ${result.organization_info.twitter || 'N/A'}`}</Text>
-            <Text>{`Facebook: ${result.organization_info.facebook || 'N/A'}`}</Text>
-            <Text>{`LinkedIn: ${result.organization_info.linkedin || 'N/A'}`}</Text>
-            <Text>{`Instagram: ${result.organization_info.instagram || 'N/A'}`}</Text>
+            <Text style={{fontFamily: 'Vercel-semi'}} className=" mt-2">Socials:</Text>
+            <Text style={{fontFamily: 'Vercel'}}>{`Twitter: ${result.organization_info.twitter || 'N/A'}`}</Text>
+            <Text style={{fontFamily: 'Vercel'}}>{`Facebook: ${result.organization_info.facebook || 'N/A'}`}</Text>
+            <Text style={{fontFamily: 'Vercel'}}>{`LinkedIn: ${result.organization_info.linkedin || 'N/A'}`}</Text>
+            <Text style={{fontFamily: 'Vercel'}}>{`Instagram: ${result.organization_info.instagram || 'N/A'}`}</Text>
           </View>
 
           {/* Employees Info */}
-          <Text className="text-xl font-bold mt-5">Employees</Text>
+          <Text style={{fontFamily: 'Vercel-semi', fontSize: 25}} className="my-5">Employees</Text>
           {result.employees.map((employee, index) => (
             <View key={index} className="mt-3 p-3 border border-gray-300 rounded">
-              <Text className="font-bold">{`Name: ${employee.name}`}</Text>
-              <Text>{`Position: ${employee.position || 'N/A'}`}</Text>
-              <Text>{`Department: ${employee.department || 'N/A'}`}</Text>
-              <Text>{`Emails: ${employee.emails.join(', ')}`}</Text>
-              <Text>{`LinkedIn: ${employee.socials.linkedin || 'N/A'}`}</Text>
-              <Text>{`Twitter: ${employee.socials.twitter || 'N/A'}`}</Text>
+              <Text style={{fontFamily: 'Vercel-semi', fontSize: 20}} className="">{`Name: ${employee.name}`}</Text>
+              <Text style={{fontFamily: 'Vercel'}}>{`Position: ${employee.position || 'N/A'}`}</Text>
+              <Text style={{fontFamily: 'Vercel'}}>{`Department: ${employee.department || 'N/A'}`}</Text>
+              <Text style={{fontFamily: 'Vercel'}}>{`Emails: ${employee.emails.join(', ')}`}</Text>
+              <Text style={{fontFamily: 'Vercel'}}>{`LinkedIn: ${employee.socials.linkedin || 'N/A'}`}</Text>
+              <Text style={{fontFamily: 'Vercel'}}>{`Twitter: ${employee.socials.twitter || 'N/A'}`}</Text>
             </View>
           ))}
         </ScrollView>
