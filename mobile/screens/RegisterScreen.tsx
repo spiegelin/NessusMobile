@@ -63,7 +63,7 @@ const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
 
   return (
     <View className="flex items-center justify-center p-5">
-      <Text style={{ fontFamily: 'Vercel-semi', fontSize: 60 }} className="mt-20 mb-5 text-center">
+      <Text style={{ fontFamily: 'Vercel-semi', fontSize: 60 }} className="text-center">
         Security Scanner
       </Text>
       <Image source={require("../assets/bancoLogo.png")} className="mb-11" />
