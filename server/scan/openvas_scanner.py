@@ -293,6 +293,7 @@ if __name__ == "__main__":
         #list_scan_configs(gmp)
 
         # Host Discovery Scan
+        """
         print("[INFO] Starting Host Discovery Scan")
         discovery_target_id = create_target(gmp, "Host Discovery Target", SCAN_TARGETS)
         if discovery_target_id:
@@ -318,7 +319,7 @@ if __name__ == "__main__":
                 print("[ERROR] Basic scan task creation failed.")
         else:
             print("[ERROR] Basic scan target creation failed.")
-
+        """
         # Malware Scan
         print("[INFO] Starting Malware Scan")
         malware_target_id = create_target(gmp, "Malware Scan Target", SCAN_TARGETS)
