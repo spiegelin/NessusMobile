@@ -67,23 +67,23 @@ const Passwords = () => {
       {result && (
         <ScrollView className="mt-6 bg-gray-100 rounded-lg flex-1">
               {/* Organización */}
-              <Text className="text-lg font-bold text-center mb-4">{`Results}`}</Text>
+              <Text style={{fontFamily: 'Vercel-semi', fontSize : 30}} className="text-center">{`Results`}</Text>
               <View className="mb-5">
-                <Text className="text-xl font-bold">General Information</Text>
-                {result.balance && <Text>{`Balance: ${result.balance}`}</Text>}
+                <Text style={{fontFamily: 'Vercel-semi', fontSize : 20}} className="my-2 ">General Information</Text>
+                {result.balance && <Text style={{fontFamily: 'Vercel-semi', fontSize: 20}}>{`Balance: ${result.balance}`}</Text>}
                 {Array.isArray(result.entries) && result.entries.map((entry, index) => (
-                  <View key={index} className="mt-3">
-                    {entry.id && <Text>{`ID: ${entry.id}`}</Text>}
-                    {entry.email && <Text>{`Email: ${entry.email}`}</Text>}
-                    {entry.ip_address && <Text>{`IP Address: ${entry.ip_address}`}</Text>}
-                    {entry.username && <Text>{`Username: ${entry.username}`}</Text>}
-                    {entry.password && <Text>{`Password: ${entry.password}`}</Text>}
-                    {entry.hashed_password && <Text>{`Hashed Password: ${entry.hashed_password}`}</Text>}
-                    {entry.name && <Text>{`Name: ${entry.name}`}</Text>}
-                    {entry.vin && <Text>{`VIN: ${entry.vin}`}</Text>}
-                    {entry.address && <Text>{`Address: ${entry.address}`}</Text>}
-                    {entry.phone && <Text>{`Phone: ${entry.phone}`}</Text>}
-                    {entry.database_name && <Text>{`Database Name: ${entry.database_name}`}</Text>}
+                  <View key={index} className="my-2">
+                    {entry.id && <Text style={{fontFamily: 'Vercel'}} className="my-2 ">{`ID: ${entry.id}`}</Text>}
+                    {entry.email && <Text style={{fontFamily: 'Vercel'}} className="my-2 ">{`Email: ${entry.email}`}</Text>}
+                    {entry.ip_address && <Text style={{fontFamily: 'Vercel'}} className="my-2 ">{`IP Address: ${entry.ip_address}`}</Text>}
+                    {entry.username && <Text style={{fontFamily: 'Vercel'}} className="my-2 ">{`Username: ${entry.username}`}</Text>}
+                    {entry.password && <Text style={{fontFamily: 'Vercel'}} className="my-2 ">{`Password: ${entry.password}`}</Text>}
+                    {entry.hashed_password && <Text style={{fontFamily: 'Vercel'}} className="my-2 ">{`Hashed Password: ${entry.hashed_password}`}</Text>}
+                    {entry.name && <Text style={{fontFamily: 'Vercel'}} className="my-2 ">{`Name: ${entry.name}`}</Text>}
+                    {entry.vin && <Text style={{fontFamily: 'Vercel'}} className="my-2 ">{`VIN: ${entry.vin}`}</Text>}
+                    {entry.address && <Text style={{fontFamily: 'Vercel'}} className="my-2 ">{`Address: ${entry.address}`}</Text>}
+                    {entry.phone && <Text style={{fontFamily: 'Vercel'}} className="my-2 ">{`Phone: ${entry.phone}`}</Text>}
+                    {entry.database_name && <Text style={{fontFamily: 'Vercel'}}>{`Database Name: ${entry.database_name}`}</Text>}
                   </View>
                 ))}
               </View>

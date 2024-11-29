@@ -70,13 +70,13 @@ const Shodan = () => {
               <Text style={{fontFamily: 'Vercel-semi', fontSize : 30}} className="text-center">{`Results`}</Text>
               <View className="mb-5">
                 <Text style={{fontFamily: 'Vercel-semi', fontSize: 20}} className="my-2">General Information</Text>
-                {result.ip && <Text style={{fontFamily: 'Vercel-semi'}} >{`IP: ${result.ip}`}</Text>}
-                {result.hostnames && <Text style={{fontFamily: 'Vercel'}} >{`Hostnames: ${result.hostnames}`}</Text>}
-                {result.ports && <Text style={{fontFamily: 'Vercel'}} >{`Ports: ${result.ports.join(", ")}`}</Text>}
-                {result.city && <Text style={{fontFamily: 'Vercel'}} >{`City: ${result.city}`}</Text>}
-                {result.country && <Text style={{fontFamily: 'Vercel'}} >{`Country: ${result.country}`}</Text>}
-                {result.latlon && <Text style={{fontFamily: 'Vercel'}} >{`LatLon: ${result.latlon}`}</Text>}
-                <Text style={{fontFamily: 'Vercel-semi', fontSize: 20}} className="font-semibold mt-2">Vulnerabilities:</Text>
+                {result.ip && <Text style={{fontFamily: 'Vercel-semi'}} className="my-2">{`IP: ${result.ip}`}</Text>}
+                {result.hostnames && <Text style={{fontFamily: 'Vercel'}} className="my-2">{`Hostnames: ${result.hostnames}`}</Text>}
+                {result.ports && <Text style={{fontFamily: 'Vercel', fontSize: 10}} className="my-2">{`Ports: ${result.ports.join(", ")}`}</Text>}
+                {result.city && <Text style={{fontFamily: 'Vercel'}} className="my-2">{`City: ${result.city}`}</Text>}
+                {result.country && <Text style={{fontFamily: 'Vercel'}} className="my-2">{`Country: ${result.country}`}</Text>}
+                {result.latlon && <Text style={{fontFamily: 'Vercel'}} className="my-2">{`LatLon: ${result.latlon}`}</Text>}
+                <Text style={{fontFamily: 'Vercel-semi', fontSize: 20}} className=" mt-2">Vulnerabilities:</Text>
                 {result.vulnerabilities.map((vuln, index) => (
                   <View key={index} className="mt-3">
                     {vuln.cve_id && <Text style={{fontFamily: 'Vercel-semi'}} className="">{`CVE ID: ${vuln.cve_id}`}</Text>}
