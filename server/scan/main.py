@@ -80,7 +80,7 @@ async def crawl(target: Target):
         # Only accepts a URL
         target = validate_target(target.target, "url")
         print("Starting to crawl website: ", target)
-        crawled_data = await crawl_website(target.target)
+        crawled_data = await crawl_website(target)
         return crawled_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
