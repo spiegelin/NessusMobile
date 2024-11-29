@@ -109,7 +109,7 @@ app.get('/webappscan', (req, res) => {
 //procesar el link para SOCIALS
 
 app.post('/process-link', authenticateToken, async (req, res) => {
-  const { target } = req.body;
+  const { target, scanCategory } = req.body;
 
   try {
     // Ensure userId is available from the token
@@ -132,13 +132,23 @@ app.post('/process-link', authenticateToken, async (req, res) => {
 
     const data = await response.json();
 
+    // Check if scan_results contains an error
+    if (data.scan_results && data.scan_results.error) {
+      // If there's an error in scan_results, do not proceed with Prisma create
+      return res.status(400).json({
+        error: `Scan failed: ${data.scan_results.error}`,
+      });
+    }
+
     // Save the scan results to the database using Prisma
     const savedScan = await prisma.scan.create({
       data: {
         url_or_ip: target,
-        scan_type: 'active',
+        scan_type: 'active', // or 'passive', depending on the logic
+        scan_category: scanCategory,  // Use provided scanCategory, default to 'unknown'
         scan_results: data, // Save the API results
         user_id: userId,    // Link the scan to the authenticated user
+        scan_category: 'social',
       },
     });
 
@@ -153,33 +163,84 @@ app.post('/process-link', authenticateToken, async (req, res) => {
   }
 });
 
-//GET SOCIALS
+
+
+//GET SOCIALS OR MAYBE NOT?????
 
 app.get('/scans', authenticateToken, async (req, res) => {
   try {
+    const { scanType, scanCategory } = req.query; // Get filter params from query
+
+    // Build filter criteria
+    const filters = {};
+    if (scanType) filters.scan_type = scanType;  // Filter by scan_type (active/passive)
+    if (scanCategory) filters.scan_category = scanCategory;  // Filter by scan_category (social/web/etc.)
+
+    // Fetch scans from the database with optional filtering
     const scans = await prisma.scan.findMany({
-      include: {
-        user: {
-          select: {
-            username: true,
-            email: true,
-          },
-        },
-        report: true,
-        vulnerabilities: {
-          include: {
-            vulnerability: true,
-          },
-        },
+      where: filters,
+    });
+
+    res.status(200).json({
+      message: 'Scans retrieved successfully',
+      scans,
+    });
+  } catch (error) {
+    console.error('Error retrieving scans:', error);
+    res.status(500).json({ error: 'Failed to retrieve scans' });
+  }
+});
+
+
+
+//post web app
+
+app.post('/process-link-web', authenticateToken, async (req, res) => {
+  const { target } = req.body;
+
+  try {
+    // Ensure userId is available from the token
+    const userId = req.user?.userId; // Extract userId from token
+
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is missing from the token' });
+    }
+
+    // Fetch data from the external API
+    const response = await fetch('http://scan-controller:8000/web-scan/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Save the scan results to the database using Prisma
+    const savedScan = await prisma.scan.create({
+      data: {
+        url_or_ip: target,
+        scan_type: 'active', //cambiar con lo que espejo diga
+        scan_results: data, // Save the API results
+        user_id: userId,    // Link the scan to the authenticated user
+        scan_category: 'social',  // Use provided scanCategory, default to 'unknown'
       },
     });
 
-    res.status(200).json({ message: 'Scans retrieved successfully', scans });
+    res.status(200).json({
+      message: `Processed link: ${target}`,
+      fastapi_response: data,
+      savedScan,
+    });
   } catch (error) {
-    console.error('Error details:', error);
-    res.status(400).json({ error: error.message });
+    console.error('Error posting the link:', error);
+    res.status(500).json({ error: 'Failed to process the link' });
   }
 });
+
 
 
 //INICIAR EL SERVIDOR

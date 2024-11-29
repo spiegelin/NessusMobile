@@ -47,6 +47,7 @@ model Scan {
   user            User                  @relation(fields: [user_id], references: [user_id])
   vulnerabilities ScanVulnerabilities[]
   scan_results    Json                  // New field to store JSON data
+  scan_category   String
 }
 
 model Report {

@@ -44,6 +44,7 @@ CREATE TABLE "Scan" (
     scan_id SERIAL PRIMARY KEY,
     url_or_ip VARCHAR(255) NOT NULL,
     scan_type "ScanType" NOT NULL, -- Use the ScanType enum
+    scan_category VARCHAR(50),     -- New column for categorizing scans (e.g., social, web, etc.)
     scan_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     user_id INT NOT NULL,
     report_id INT,
@@ -51,6 +52,9 @@ CREATE TABLE "Scan" (
     FOREIGN KEY (user_id) REFERENCES "User"(user_id) ON DELETE CASCADE,
     FOREIGN KEY (report_id) REFERENCES "Report"(report_id) ON DELETE SET NULL
 );
+
+-- Create an index on scan_type and scan_category to optimize filtering
+CREATE INDEX IF NOT EXISTS "idx_scan_type_category" ON "Scan" ("scan_type", "scan_category");
 
 -- Create the Vulnerability table
 CREATE TABLE "Vulnerability" (
