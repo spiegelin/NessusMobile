@@ -41,7 +41,7 @@ class OpenAIData(BaseModel):
     cvss: Optional[float] = None
 
 # Get OSINT information about a target
-@app.get("/osint")
+@app.post("/osint")
 async def osint(target: Target):
     try:
         # Accepts an IP or a domain
