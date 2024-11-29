@@ -23,6 +23,13 @@ CREATE TABLE "UserRoles" (
     FOREIGN KEY (role_id) REFERENCES "Role"(role_id) ON DELETE CASCADE
 );
 
+-- Create the ScanType enum
+DO $$ BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'ScanType') THEN
+        CREATE TYPE "ScanType" AS ENUM ('passive', 'active');
+    END IF;
+END $$;
+
 -- Create the Report table
 CREATE TABLE "Report" (
     report_id SERIAL PRIMARY KEY,
@@ -36,13 +43,18 @@ CREATE TABLE "Report" (
 CREATE TABLE "Scan" (
     scan_id SERIAL PRIMARY KEY,
     url_or_ip VARCHAR(255) NOT NULL,
-    scan_type VARCHAR(10) NOT NULL CHECK (scan_type IN ('passive', 'active')),
+    scan_type "ScanType" NOT NULL, -- Use the ScanType enum
+    scan_category VARCHAR(50),     -- New column for categorizing scans (e.g., social, web, etc.)
     scan_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     user_id INT NOT NULL,
     report_id INT,
+    scan_results JSON,
     FOREIGN KEY (user_id) REFERENCES "User"(user_id) ON DELETE CASCADE,
     FOREIGN KEY (report_id) REFERENCES "Report"(report_id) ON DELETE SET NULL
 );
+
+-- Create an index on scan_type and scan_category to optimize filtering
+CREATE INDEX IF NOT EXISTS "idx_scan_type_category" ON "Scan" ("scan_type", "scan_category");
 
 -- Create the Vulnerability table
 CREATE TABLE "Vulnerability" (
