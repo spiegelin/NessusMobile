@@ -12,7 +12,7 @@ type AdvancedScanProps = {
 
 const AdvancedScans = ({ navigation }: AdvancedScanProps) => {
   const advancedScanTools = [
-    { name: 'WebApp Scan', image: require('../assets/bancoCogs.jpg') , desc : "WebApp Scan is a tool that scans web applications for vulnerabilities and security issues."},
+    { name: 'Basic Scan' , image : require('../assets/bancoLifeline2.png') , desc : "Perform a quick vulnerability scan for immediate insights." },
     { name: 'Host Discovery', image: require('../assets/bancoCogs.jpg') ,desc : "Host Discovery is a tool that scans a network for active hosts and devices."},
     { name: 'Malware Scan', image: require('../assets/bancoCogs.jpg') , desc : "Malware Scan is a tool that scans files and directories for malware and viruses."},
    

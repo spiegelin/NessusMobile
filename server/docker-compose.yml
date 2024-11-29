@@ -69,6 +69,8 @@ services:
     environment:
     - USERNAME=${OPENVAS_USER} 
     - PASSWORD=${OPENVAS_PASSWORD} 
+    mem_limit: 8g  
+    cpus: 4
 
 volumes:
   postgres_data:

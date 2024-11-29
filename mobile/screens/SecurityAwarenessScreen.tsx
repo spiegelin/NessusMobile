@@ -1,7 +1,5 @@
-
-import React, {useState} from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
-
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 
 const SecurityAwarenessScreen = () => {
   const [openTipIndex, setOpenTipIndex] = useState<number | null>(null);
@@ -10,27 +8,42 @@ const SecurityAwarenessScreen = () => {
     setOpenTipIndex(openTipIndex === index ? null : index);
   };
 
+  const tips = [
+    {
+      title: 'Password Management', content: 'Use strong, unique passwords and enable two-factor authentication (2FA) wherever possible.',
+    },
+    {
+      title: 'Email Security', content: 'Be cautious with email links and attachments. Avoid sharing sensitive information via email.',
+    },
+    {
+      title: 'Software Updates', content: 'Regularly update all software and systems to patch vulnerabilities. Automate updates when possible.',
+    },
+    {
+      title: 'Network Security', content: 'Use firewalls and intrusion detection systems. Segment your network to limit exposure in case of a breach.',
+    },
+    {
+      title: 'Phishing Awareness', content: 'Train employees to recognize phishing attempts. Encourage reporting suspicious emails to the IT department.',
+    },
+  ];
+
   return (
     <View className="flex-1 p-5">
       <View className="flex-col justify-between items-center w-full mb-6">
-        <Text style={{ fontFamily: 'Vercel-semi', fontSize: 40 }} className="mb-5 text-center">
+        <Text style={{ fontFamily: 'Vercel-semi', fontSize: 42 }} className=" flex mb-5 text-center justify-center">
           Security Awareness Tips
         </Text>
       </View>
-      <Text className="text-xl font-bold mb-3">Security Awareness</Text>
-      {[1, 2, 3, 4, 5].map((tip, index) => (
-        <View key={tip} className="w-full mb-3">
+      {tips.map((tip, index) => (
+        <View key={index} className="w-full mb-3">
           <TouchableOpacity
             className="p-3 bg-gray-200"
             onPress={() => toggleTip(index)}
           >
-            <Text className="text-base">Tip {tip}</Text>
+            <Text style={{ fontFamily: 'Vercel-semi', fontSize: 23 }} >{tip.title}</Text>
           </TouchableOpacity>
           {openTipIndex === index && (
             <View className="p-3 bg-gray-100">
-              <Text className="text-gray-700">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Tip {tip} details: Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              </Text>
+              <Text style={{ fontFamily: 'Vercel-semi', fontSize: 18 }} className="text-gray-700">{tip.content}</Text>
             </View>
           )}
         </View>

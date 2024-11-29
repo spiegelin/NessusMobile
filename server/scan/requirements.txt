@@ -8,3 +8,7 @@ bs4
 zaproxy
 gvm-tools==21.1.0
 python-gvm
+openai
+typing
+asyncio
+xmltodict
