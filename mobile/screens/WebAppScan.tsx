@@ -68,7 +68,7 @@ const WebAppScan = () => {
       {result && ( 
         <ScrollView className="mt-6 bg-gray-100 p-4 rounded-lg flex-1">
               <Text className="" style={{ fontFamily: 'Vercel', fontSize: 10 }}>{`Generated: ${result.generated}`}</Text>
-              {result.sites.map((site, index) => (
+              {result.site.map((site, index) => (
                 <View key={index} className="mb-5">
                   <Text className="" style={{ fontFamily: 'Vercel-semi', fontSize: 25 }}>{`Site: ${site.name}`}</Text>
                   {site.alerts.map((alert, alertIndex) => (
