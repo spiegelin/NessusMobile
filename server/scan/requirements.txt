@@ -9,7 +9,6 @@ zaproxy
 gvm-tools==21.1.0
 python-gvm
 openai
-socket
 typing
 asyncio
 xmltodict

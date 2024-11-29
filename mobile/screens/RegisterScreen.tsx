@@ -15,27 +15,49 @@ const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
 
+  const validatePassword = (password: string) => {
+    const uppercasePattern = /[A-Z]/;
+    const numberPattern = /\d/;
+    const specialCharPattern = /[!@#$%^&*(),.?":{}|<>]/;
+
+    if (password.length < 12) {
+      return 'Password must be at least 12 characters long';
+    }
+    if (!uppercasePattern.test(password)) {
+      return 'Password must contain at least one uppercase letter';
+    }
+    if (!numberPattern.test(password)) {
+      return 'Password must contain at least one number';
+    }
+    if (!specialCharPattern.test(password)) {
+      return 'Password must contain at least one special character';
+    }
+    return '';
+  };
+
   const handleRegister = async () => {
-    if (!email || !password) {
+    const passwordError = validatePassword(password);
+    if (!email || !username || !password || !confirmPassword) {
       setError('Please fill in all fields');
     } else if (password !== confirmPassword) {
       setError('Passwords do not match');
-    } else if (!username) {
-      setError('Please fill in a username');
+    } else if (passwordError) {
+      setError(passwordError);
     } else {
-      setError('');      
-    }
-    try {
-      const response = await axios.post(`http://10.0.2.2:3000/register`, {
-        email,
-        username,
-        password
-    });
-      if (response.status === 201) {
-        navigation.navigate('Login');
+      setError('');
+      try {
+        const response = await axios.post(`http://10.0.2.2:3000/register`, {
+          email,
+          username,
+          password
+        });
+        if (response.status === 201) {
+          navigation.navigate('Login');
+        }
+      } catch (error) {
+        console.error(error);
+        setError('Registration failed, please try again.');
       }
-    } catch (error) {
-      console.error(error);
     }
   };
 
@@ -48,7 +70,7 @@ const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
       <TextInput className="w-full h-10 border border-gray-400 rounded mb-3 px-3" placeholder="Email" value={email} onChangeText={setEmail} />
       <TextInput className="w-full h-10 border border-gray-400 rounded mb-3 px-3" placeholder="Username" value={username} onChangeText={setUsername} />
       <TextInput className="w-full h-10 border border-gray-400 rounded mb-3 px-3" placeholder="Password" secureTextEntry value={password} onChangeText={setPassword} />
-      <TextInput className="w-full h-10 border border-gray-400 rounded mb-3 px-3" placeholder="Confirm Password" secureTextEntry value={confirmPassword} onChangeText={setConfirmPassword}/>
+      <TextInput className="w-full h-10 border border-gray-400 rounded mb-3 px-3" placeholder="Confirm Password" secureTextEntry value={confirmPassword} onChangeText={setConfirmPassword} />
       {error ? <Text className="text-red-500 mb-3">{error}</Text> : null}
       <View className="flex-row justify-around w-full">
         <TouchableOpacity className="bg-red-500 p-3 rounded-md mt-3" onPress={handleRegister}>

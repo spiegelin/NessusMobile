@@ -10,19 +10,26 @@ type HomeScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, 'Home'>;
 };
 
+
 const HomeScreen = ({ navigation }: HomeScreenProps) => {
   const scanTools = [
-    { name: 'Basic Scan', image: require('../assets/bancoLifeline2.png') , desc: "Perform a quick vulnerability scan for immediate insights." },
-    { name: 'Advanced Scan', image: require('../assets/bancoCogs.jpg') ,desc : "Dive deeper into vulnerabilities with customizable scan settings."},
-    { name: 'OSINT search', image: require('../assets/bancoWeb.png') , desc : "Gather publicly available data to enhance threat analysis." },
+    { name: 'WebApp Scan', image : require('../assets/bancoCogs.jpg') , desc : "Identify Web Application vulnerabilities and security issues." },
+    { name: 'Advanced Scans', image: require('../assets/bancoCogs.jpg') ,desc : "Dive deeper into vulnerabilities with different scanners."},
+    { name: 'OSINT', image: require('../assets/bancoWeb.png') , desc : "Gather publicly available data to enhance threat analysis." },
     { name: 'View Reports', image: require('../assets/bancoReports4.png') , desc : "Access detailed scan reports for review and decision-making." },
-    { name: 'Scan History', image: require('../assets/bancoHistory.png') , desc : "Review past scans and track security trends over time."},
     { name: 'Security Awareness', image: require('../assets/bancoSecurityAware.png') , desc : "Learn best practices to strengthen your security posture." },
+    { name: 'Settings' , image: require('../assets/bancoCogs.jpg') , desc : "Customize your security scanner settings." },
   ];
- 
+
+  const [api , setApi] = useState('');
+
+
   return (
     <View className="flex p-5 items-center">
       <ScrollView>
+        
+          
+        
       <View className="flex-col justify-between items-center w-full ">
         <Text style={{ fontFamily: "Vercel-semi", fontSize: 40 }} className="text-center">Security Scanner</Text>
       </View>

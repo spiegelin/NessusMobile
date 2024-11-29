@@ -80,7 +80,7 @@ async def crawl(target: Target):
         # Only accepts a URL
         target = validate_target(target.target, "url")
         print("Starting to crawl website: ", target)
-        crawled_data = await crawl_website(target.target)
+        crawled_data = await crawl_website(target)
         return crawled_data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -121,9 +121,9 @@ async def web_scan(target: Target):
         return {"error": str(e)}
     
 @app.post("/process-link")
-async def process_link(link: str):
+async def process_link(target: Target):
     # Process the link here
-    return {"message": f"Processing {link}"}
+    return {"message": f"Processing {target.target} + uwu"}
 
 @app.post("/ai-solutions")
 async def ai_solutions(data: OpenAIData):

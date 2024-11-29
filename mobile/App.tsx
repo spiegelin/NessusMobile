@@ -10,13 +10,18 @@ import HomeScreen from './screens/HomeScreen';
 import BasicScanScreen from './screens/BasicScanScreen';
 import ViewReportsScreen from './screens/ViewReportsScreen';
 import SecurityAwarenessScreen from './screens/SecurityAwarenessScreen';
-import ScanHistory from './screens/ScanHistory';
+
 import AdvancedScans from './screens/AdvancedScan';
-import OSINTsearch from './screens/OSINTsearch';
+import OSINT from './screens/OSINTsearch';
 import RegisterScreen from './screens/RegisterScreen';
 import HostDiscovery from './screens/HostDiscovery';
 import WebAppScan from './screens/WebAppScan';
 import MalwareScan from './screens/MalwareScan';
+import Settings from './screens/Settings';  
+import Passwords from './screens/Passwords';
+import Shodan from './screens/Shodan';
+import Socials from './screens/Socials';
+import Crawl from './screens/Crawl';
 
 // Define the types for our navigation parameters
 export type RootStackParamList = {
@@ -26,12 +31,16 @@ export type RootStackParamList = {
   BasicScan: undefined;
   ViewReports: undefined;
   SecurityAwareness: undefined;
-  ScanHistory: undefined;
-  AdvancedScan: undefined;
-  OSINTsearch: undefined;
+  AdvancedScans: undefined;
+  OSINT: undefined;
   WebAppScan: undefined;
   MalwareScan: undefined;
   HostDiscovery: undefined;
+  Settings: undefined;
+  Passwords: undefined;
+  Shodan : undefined;
+  Socials : undefined;
+  Crawl : undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -50,7 +59,7 @@ const App = () => {
   return (
 
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Home" component={HomeScreen} />
@@ -58,10 +67,17 @@ const App = () => {
         <Stack.Screen name="BasicScan" component={BasicScanScreen} />
         <Stack.Screen name="ViewReports" component={ViewReportsScreen} />
         <Stack.Screen name="SecurityAwareness" component={SecurityAwarenessScreen} />
-        <Stack.Screen name="OSINTsearch" component={OSINTsearch} />
-        <Stack.Screen name="ScanHistory" component={ScanHistory} />
 
-        <Stack.Screen name="AdvancedScan" component={AdvancedScans} />
+        <Stack.Screen name="OSINT" component={OSINT} />
+        <Stack.Screen name='Passwords' component={Passwords} />
+        <Stack.Screen name='Socials' component={Socials} />
+        <Stack.Screen name='Crawl' component={Crawl} />
+        <Stack.Screen name='Shodan' component={Shodan} />
+
+
+        <Stack.Screen name="Settings" component={Settings} />
+
+        <Stack.Screen name="AdvancedScans" component={AdvancedScans} />
         <Stack.Screen name="WebAppScan" component={WebAppScan} />
         <Stack.Screen name="MalwareScan" component={MalwareScan} />
         <Stack.Screen name="HostDiscovery" component={HostDiscovery} />
