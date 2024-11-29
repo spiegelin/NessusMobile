@@ -23,7 +23,7 @@ import xmltodict
 
 # OpenVAS configuration
 load_dotenv()
-OPENVAS_HOST = '127.0.0.1'
+OPENVAS_HOST = 'openvas-scanner'
 OPENVAS_PORT = os.getenv("OPENVAS_PORT", 9390)  # OpenVAS GMP port
 OPENVAS_USERNAME = os.getenv("OPENVAS_USER")  # Default admin user
 OPENVAS_PASSWORD = os.getenv("OPENVAS_PASSWORD")  # Replace with your admin password
