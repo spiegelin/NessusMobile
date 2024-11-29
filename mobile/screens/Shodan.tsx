@@ -1,62 +1,40 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, ActivityIndicator, Alert } from 'react-native';
 import axios from 'axios';
+import * as SecureStore from 'expo-secure-store';
 
 const Shodan = () => {
   const [input, setInput] = useState<string>(''); 
-  const [result, setResult] = useState<{
-    ip: string,
-    hostnames: string[],
-    ports: number[],
-    city: string,
-    country: string,
-    latlon: string,
-    vulnerabilities: Array<{
-      cve_id: string,
-      cvss: number,
-      published_time: string,
-      summary: string,
-    }>;
-  } | null>(null);
+  const [result, setResult] = useState(null);
   const [loading, setLoading] = useState<boolean>(false); 
 
   const handleScan = async () => {
     setLoading(true);
     setResult(null);
+
     try {
-      const response = await axios.post('http://10.0.2.2:8000/osint', { target: input });
-      console.log({target: input});
-      const parsedResults = parseScanResults(response.data);
-      setResult(parsedResults);
+      const token = await SecureStore.getItemAsync('authToken');
+      if (!token) {
+        Alert.alert('Error', 'No authentication token found');
+        setLoading(false);
+        return;
+      }
+
+      const response = await axios.post(
+        'http://10.0.2.2:3000/process-link-shodan',
+        { target: input },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.status === 200) {
+        setResult(response.data.fastapi_response);
+      }
     } catch (error) {
       console.error('Error:', error);
-      if (axios.isAxiosError(error) && error.response) {
-        console.error('Error:', error.response.data);
-      } else {
-        console.error('Error:', error);
-      }
-      setResult(null); 
+      Alert.alert('Error', 'Failed to fetch data. Please try again.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const parseScanResults = (data: any) => {
-    if (!data) return null;
-    return {
-      ip: data.ip,
-      hostnames: data.hostnames,
-      ports: data.ports,
-      city: data.city,
-      country: data.country,
-      latlon: data.latlon,
-      vulnerabilities: data.vulnerabilities.map((vuln: any) => ({
-        cve_id: vuln.cve_id,
-        cvss: vuln.cvss,
-        published_time: vuln.published_time,
-        summary: vuln.summary,
-      })),
-    };
   };
 
   return (
@@ -80,15 +58,14 @@ const Shodan = () => {
           {loading ? "Scanning..." : "Start Scan"}
         </Text>
       </TouchableOpacity>
-      {loading ? (
+      {loading && (
         <View className="mt-6 flex-1 justify-center items-center">
           <ActivityIndicator size="large" color="#000000" />
           <Text className="text-gray-700 mt-2">Scanning...</Text>
         </View>
-      ) : (
+      )}
+      {result && (
         <ScrollView className="mt-6 bg-gray-100 rounded-lg flex-1">
-          {result ? (
-            <>
               {/* Organización */}
               <Text className="text-lg font-bold text-center mb-4">{`Results}`}</Text>
               <View className="mb-5">
@@ -109,14 +86,10 @@ const Shodan = () => {
                   </View>
                 ))}
               </View>
-            </>
-          ) : (
-            <Text className="text-gray-500 text-center">No results to display.</Text>
-          )}
         </ScrollView>
       )}
     </View>
   );
-};
+}
 
 export default Shodan;

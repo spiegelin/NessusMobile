@@ -119,11 +119,6 @@ async def web_scan(target: Target):
         return scan_data
     except Exception as e:
         return {"error": str(e)}
-    
-@app.post("/process-link")
-async def process_link(target: Target):
-    # Process the link here
-    return {"message": f"Processing {target.target} + uwu"}
 
 @app.post("/ai-solutions")
 async def ai_solutions(data: OpenAIData):
