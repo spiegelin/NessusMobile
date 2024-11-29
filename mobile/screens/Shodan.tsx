@@ -41,7 +41,7 @@ const Shodan = () => {
     <View className="flex-1 p-5">
       <View className="flex-col justify-between items-center w-full mb-6">
         
-      <Text style={{ fontFamily: 'Vercel-semi', fontSize: 50 }} className="mt-20 mb-5 text-center">Shodan Scan</Text>
+      <Text style={{ fontFamily: 'Vercel-semi', fontSize: 50 }} className=" text-center">Shodan Scan</Text>
       </View>
       <TextInput
         className="w-full h-10 border border-gray-400 rounded mb-3 px-3"
@@ -67,11 +67,27 @@ const Shodan = () => {
       {result && (
         <ScrollView className="mt-6 bg-gray-100 rounded-lg flex-1">
               {/* Organización */}
-              <Text style={{fontFamily: 'Vercel-semi', fontSize : 30}} className="text-center">{`Results`}</Text>
               <View className="mb-5">
-                <Text style={{fontFamily: 'Vercel-semi', fontSize: 20}} className="my-2">General Information</Text>
-                {result.ip && <Text style={{fontFamily: 'Vercel-semi'}} className="my-2">{`IP: ${result.ip}`}</Text>}
-                {result.hostnames && <Text style={{fontFamily: 'Vercel'}} className="my-2">{`Hostnames: ${result.hostnames}`}</Text>}
+                {result.ip && <Text style={{fontFamily: 'Vercel-semi', fontSize: 20}} className="rounded-lg p-2 bg-black text-center text-white">{`${result.ip}`}</Text>}
+                {result.hostnames && (
+  <>
+    <Text style={{ fontFamily: 'Vercel' }} className="my-2">
+      Hostnames:
+    </Text>
+    <View className="flex flex-wrap flex-row">
+      {result.hostnames.map((hostname, index) => (
+        <Text
+          key={index}
+          style={{ fontFamily: 'Vercel' }}
+          className="bg-gray-200 p-2 m-1 rounded"
+        >
+          {hostname}
+        </Text>
+      ))}
+    </View>
+  </>
+)}
+
                 {result.ports && <Text style={{fontFamily: 'Vercel', fontSize: 10}} className="my-2">{`Ports: ${result.ports.join(", ")}`}</Text>}
                 {result.city && <Text style={{fontFamily: 'Vercel'}} className="my-2">{`City: ${result.city}`}</Text>}
                 {result.country && <Text style={{fontFamily: 'Vercel'}} className="my-2">{`Country: ${result.country}`}</Text>}
