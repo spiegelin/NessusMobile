@@ -54,7 +54,7 @@ const Shodan = () => {
         onPress={handleScan}
         disabled={loading}
       >
-        <Text className="text-white text-center">
+        <Text style={{fontFamily: 'Vercel-semi'}} className="text-white text-center">
           {loading ? "Scanning..." : "Start Scan"}
         </Text>
       </TouchableOpacity>
@@ -67,22 +67,22 @@ const Shodan = () => {
       {result && (
         <ScrollView className="mt-6 bg-gray-100 rounded-lg flex-1">
               {/* Organización */}
-              <Text className="text-lg font-bold text-center mb-4">{`Results}`}</Text>
+              <Text style={{fontFamily: 'Vercel-semi', fontSize : 30}} className="text-center">{`Results`}</Text>
               <View className="mb-5">
-                <Text className="text-xl font-bold">General Information</Text>
-                {result.ip && <Text>{`IP: ${result.ip}`}</Text>}
-                {result.hostnames && <Text>{`Hostnames: ${result.hostnames}`}</Text>}
-                {result.ports && <Text>{`Ports: ${result.ports.join(", ")}`}</Text>}
-                {result.city && <Text>{`City: ${result.city}`}</Text>}
-                {result.country && <Text>{`Country: ${result.country}`}</Text>}
-                {result.latlon && <Text>{`LatLon: ${result.latlon}`}</Text>}
-                <Text className="font-semibold mt-2">Vulnerabilities:</Text>
+                <Text style={{fontFamily: 'Vercel-semi', fontSize: 20}} className="my-2">General Information</Text>
+                {result.ip && <Text style={{fontFamily: 'Vercel-semi'}} >{`IP: ${result.ip}`}</Text>}
+                {result.hostnames && <Text style={{fontFamily: 'Vercel'}} >{`Hostnames: ${result.hostnames}`}</Text>}
+                {result.ports && <Text style={{fontFamily: 'Vercel'}} >{`Ports: ${result.ports.join(", ")}`}</Text>}
+                {result.city && <Text style={{fontFamily: 'Vercel'}} >{`City: ${result.city}`}</Text>}
+                {result.country && <Text style={{fontFamily: 'Vercel'}} >{`Country: ${result.country}`}</Text>}
+                {result.latlon && <Text style={{fontFamily: 'Vercel'}} >{`LatLon: ${result.latlon}`}</Text>}
+                <Text style={{fontFamily: 'Vercel-semi', fontSize: 20}} className="font-semibold mt-2">Vulnerabilities:</Text>
                 {result.vulnerabilities.map((vuln, index) => (
                   <View key={index} className="mt-3">
-                    {vuln.cve_id && <Text className="font-semibold">{`CVE ID: ${vuln.cve_id}`}</Text>}
-                    {vuln.cvss && <Text className="font-semibold">{`CVSS: ${vuln.cvss}`}</Text>}
-                    {vuln.published_time && <Text className="font-semibold">{`Published Time: ${vuln.published_time}`}</Text>}
-                    {vuln.summary && <Text className="font-semibold">{`Summary: ${vuln.summary}`}</Text>}
+                    {vuln.cve_id && <Text style={{fontFamily: 'Vercel-semi'}} className="">{`CVE ID: ${vuln.cve_id}`}</Text>}
+                    {vuln.cvss && <Text style={{fontFamily: 'Vercel-semi'}} className="">{`CVSS: ${vuln.cvss}`}</Text>}
+                    {vuln.published_time && <Text style={{fontFamily: 'Vercel'}} className="font-semibold">{`Published Time: ${vuln.published_time}`}</Text>}
+                    {vuln.summary && <Text style={{fontFamily: 'Vercel'}} className="font-semibold">{`Summary: ${vuln.summary}`}</Text>}
                   </View>
                 ))}
               </View>

@@ -13,15 +13,14 @@ type HomeScreenProps = {
 
 const HomeScreen = ({ navigation }: HomeScreenProps) => {
   const scanTools = [
-    { name: 'WebApp Scan', image : require('../assets/bancoCogs.jpg') , desc : "Identify Web Application vulnerabilities and security issues." },
-    { name: 'Advanced Scans', image: require('../assets/bancoCogs.jpg') ,desc : "Dive deeper into vulnerabilities with different scanners."},
+    { name: 'WebApp Scan', image : require('../assets/bancoTarget.png') , desc : "Identify Web Application vulnerabilities and security issues." },
+    { name: 'Advanced Scans', image: require('../assets/bancoAdvanced.png') ,desc : "Dive deeper into vulnerabilities with different scanners."},
     { name: 'OSINT', image: require('../assets/bancoWeb.png') , desc : "Gather publicly available data to enhance threat analysis." },
-    { name: 'View Reports', image: require('../assets/bancoReports4.png') , desc : "Access detailed scan reports for review and decision-making." },
-    { name: 'Security Awareness', image: require('../assets/bancoSecurityAware.png') , desc : "Learn best practices to strengthen your security posture." },
+    { name: 'View Reports', image: require('../assets/bancoArchive.png') , desc : "Access detailed scan reports for review and decision-making." },
+    { name: 'Security Awareness', image: require('../assets/bancoSecurityAwareness.png') , desc : "Learn best practices to strengthen your security posture." },
     { name: 'Settings' , image: require('../assets/bancoCogs.jpg') , desc : "Customize your security scanner settings." },
   ];
 
-  const [api , setApi] = useState('');
 
 
   return (
@@ -38,7 +37,7 @@ const HomeScreen = ({ navigation }: HomeScreenProps) => {
         {scanTools.map((tool, index) => (
           <TouchableOpacity
             key={index}
-            className="w-[45%] bg-black rounded-lg p-5 m-1 items-center shadow-xl shadow-black"
+            className="w-[45%] bg-black rounded-lg p-5 m-1 items-center shadow-sm shadow-black"
             onPress={() => navigation.navigate(tool.name.replace(' ', '') as keyof RootStackParamList)}>
             <Image source={tool.image} className="w-[90%] h-28 mb-2" />
             <Text className="text-center text-white" style={{ fontFamily: "Vercel-semi", fontSize: 15 }}>{tool.name}</Text>
