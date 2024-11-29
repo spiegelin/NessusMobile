@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, Modal } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Alert, Modal, Image } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import axios from 'axios';
 import { RootStackParamList } from '../App';
@@ -104,7 +104,7 @@ useEffect(() => {
     
     console.log("llega aquu");
     try {
-      const response = await axios.post(`http://10.0.2.2:3000/login`, { email, password });
+      const response = await axios.post(`http://localhost:3000/login`, { email, password });
       const token = response.data.token;
 
       if (token) {
@@ -136,7 +136,9 @@ useEffect(() => {
 
   return (
     <View className="flex-1 justify-center p-5">
+      
       <Text className="text-6xl font-semibold text-center mt-20 mb-5">Security Scanner</Text>
+      <Image source={require("../assets/bancoLogo.png")} className="mb-11" />
       <TextInput
         className="w-full h-12 border border-gray-400 rounded mb-3 px-4"
         placeholder="Email"
@@ -155,13 +157,18 @@ useEffect(() => {
           Bloqueado. Tiempo restante: {formatTime(remainingTime)}
         </Text>
       )}
-      <TouchableOpacity
-          className={`p-3 rounded-md mt-3 ${isBlocked ? 'bg-gray-400' : 'bg-red-500'}`}
-          onPress={handleLogin}
-          disabled={isBlocked}
-        >
+      <View className="flex flex-row justify-around w-full">
+        <TouchableOpacity
+            className={`p-3 rounded-md mt-3 ${isBlocked ? 'bg-gray-400' : 'bg-red-500'}`}
+            onPress={handleLogin}
+            disabled={isBlocked}
+          >
           <Text className="text-white text-center" style={{ fontFamily: "Vercel-semi" }}>Log In</Text>
         </TouchableOpacity>
+        <TouchableOpacity className="bg-gray-500 p-3 rounded-md mt-3" onPress={() => navigation.navigate('Register')}>
+          <Text className="text-white text-center" style={{ fontFamily: "Vercel-semi" }}>Register</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* OTP Modal */}
       <Modal visible={showOtpModal} transparent animationType="slide">
