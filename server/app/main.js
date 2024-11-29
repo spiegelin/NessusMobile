@@ -275,6 +275,62 @@ app.post('/process-link-shodan', authenticateToken, async (req, res) => {
   }
 });
 
+// Procesar link para Passwords
+app.post('/process-link-passwords', authenticateToken, async (req, res) => {
+  const { target, scanCategory } = req.body;
+
+  try {
+    // Ensure userId is available from the token
+    const userId = req.user?.userId; // Extract userId from token
+
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is missing from the token' });
+    }
+
+    // Fetch data from the external API
+    const response = await fetch('http://scan-controller:8000/passwords/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ target }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Check if scan_results contains an error
+    if (data.scan_results && data.scan_results.error) {
+      // If there's an error in scan_results, do not proceed with Prisma create
+      return res.status(400).json({
+        error: `Scan failed: ${data.scan_results.error}`,
+      });
+    }
+
+    // Save the scan results to the database using Prisma
+    const savedScan = await prisma.scan.create({
+      data: {
+        url_or_ip: target,
+        scan_type: 'active', // or 'passive', depending on the logic
+        scan_category: scanCategory,  // Use provided scanCategory, default to 'unknown'
+        scan_results: data, // Save the API results
+        user_id: userId,    // Link the scan to the authenticated user
+        scan_category: 'passwords',
+      },
+    });
+
+    res.status(200).json({
+      message: `Processed link: ${target}`,
+      fastapi_response: data,
+      savedScan,
+    });
+  } catch (error) {
+    console.error('Error posting the link:', error);
+    res.status(500).json({ error: 'Failed to process the link' });
+  }
+});
+
 //GET SOCIALS OR MAYBE NOT?????
 
 app.get('/scans', authenticateToken, async (req, res) => {
