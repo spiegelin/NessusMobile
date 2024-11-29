@@ -3,19 +3,109 @@ const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const fetch = require('node-fetch');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 
 const app = express();
 const prisma = new PrismaClient();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret'; // Use an environment variable for security
+// Configuración
+const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret'; // Usa una variable de entorno para mayor seguridad
+const OTP_EXPIRY_TIME = 10 * 60 * 1000; // Tiempo de expiración del OTP (10 minutos)
 
+// Middleware
 app.use(express.json());
 
-//Test route
-
+// Ruta de prueba
 app.get('/test', (req, res) => {
   res.send('Server is working!');
 });
+
+// Configuración de transporte de correo
+const transporter = nodemailer.createTransport({
+  service: 'gmail', // Cambia el servicio si usas otro proveedor
+  auth: {
+    user: process.env.EMAIL_USER, // Correo del remitente
+    pass: process.env.EMAIL_PASS, // Contraseña o contraseña específica para apps
+  },
+});
+
+// Ruta para enviar OTP
+app.post('/send-otp', async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    // Verificar si el usuario existe
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    // Generar OTP
+    const otp = crypto.randomInt(100000, 999999).toString(); // Generar un OTP de 6 dígitos
+    const otpexpiry = new Date(Date.now() + OTP_EXPIRY_TIME); // Tiempo de expiración del OTP
+
+    // Guardar OTP y tiempo de expiración en la base de datos
+    await prisma.user.update({
+      where: { email },
+      data: { otp, otpexpiry },
+    });
+
+    // Configuración del correo
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'Tu OTP para iniciar sesión',
+      text: `Tu OTP es: ${otp}. Expira en 10 minutos.`,
+    };
+
+    // Enviar el correo
+    await transporter.sendMail(mailOptions);
+    console.log('OTP enviado a:', email); // Log de confirmación
+
+    res.status(200).json({ message: 'OTP enviado a tu correo' });
+  } catch (error) {
+    console.error('Error al enviar OTP:', error);
+    res.status(500).json({ error: 'Hubo un problema al enviar tu OTP' });
+  }
+});
+
+// Ruta para verificar OTP
+app.post('/verify-otp', async (req, res) => {
+  const { email, otp } = req.body;
+
+  try {
+    // Buscar usuario por email
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    // Validar OTP y su expiración
+    if (user.otp !== otp) {
+      return res.status(400).json({ error: 'OTP inválido' });
+    }
+
+    if (Date.now() > user.otpexpiry.getTime()) {
+      return res.status(400).json({ error: 'El OTP ha expirado' });
+    }
+
+    // Generar un token JWT como respuesta
+
+    res.status(200).json({ success: true, message: 'OTP verificado correctamente' });
+  } catch (error) {
+    console.error('Error al verificar OTP:', error);
+    res.status(500).json({ error: 'Hubo un problema al verificar tu OTP' });
+  }
+});
+//aqui termina la seccion de otp
+
 
 //Seccion de inicio de usuarios
 

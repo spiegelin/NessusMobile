@@ -21,7 +21,7 @@ const Socials = () => {
       }
 
       const response = await axios.post(
-        'http://10.0.2.2:3000/process-link',
+        'http://localhost:3000/process-link',
         { target: input },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -75,6 +75,7 @@ const Socials = () => {
       {result && (
         <ScrollView className="mt-6 bg-gray-100 rounded-lg flex-1 p-3">
           {/* Organization Info */}
+
           <Text style={{fontFamily: 'Vercel-semi', fontSize: 30}} className="bg-black p-2 text-white rounded-lg my-2">{`${result.organization_info.name}`}</Text>
           <View className="rounded-lg border-2 border-gray-400 bg-gray-200 p-2 mt-2">
             <Text className="" style={{fontFamily: 'Vercel-semi'}}>{`Domain: ${result.organization_info.domain}`}</Text>
@@ -86,6 +87,7 @@ const Socials = () => {
             <Text style={{fontFamily: 'Vercel'}}>{`State: ${result.organization_info.state || 'N/A'}`}</Text>
             <Text style={{fontFamily: 'Vercel'}} >{`Street: ${result.organization_info.street || 'N/A'}`}</Text>
 
+
             <Text style={{fontFamily: 'Vercel-semi'}} className=" mt-2">Socials:</Text>
             <Text style={{fontFamily: 'Vercel'}}>{`Twitter: ${result.organization_info.twitter || 'N/A'}`}</Text>
             <Text style={{fontFamily: 'Vercel'}}>{`Facebook: ${result.organization_info.facebook || 'N/A'}`}</Text>
@@ -94,7 +96,9 @@ const Socials = () => {
           </View>
 
           {/* Employees Info */}
+
           <Text style={{fontFamily: 'Vercel-semi', fontSize: 25}} className="bg-black p-2 text-white rounded-lg mt-3">Employees</Text>
+
           {result.employees.map((employee, index) => (
             <View key={index} className="mt-3 p-3 border border-gray-300 rounded">
               <Text style={{fontFamily: 'Vercel-semi', fontSize: 20}} className="">{`Name: ${employee.name}`}</Text>
