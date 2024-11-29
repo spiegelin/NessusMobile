@@ -40,7 +40,7 @@ const Crawl = () => {
   return (
     <View className="flex-1 p-5">
       <View className="flex-col justify-between items-center w-full mb-6">
-      <Text style={{ fontFamily: 'Vercel-semi', fontSize: 60 }} className="mt-20 mb-5 text-center">Crawl</Text>
+      <Text style={{ fontFamily: 'Vercel-semi', fontSize: 60 }} className="mb-5 text-center">Crawl</Text>
       </View>
       <TextInput
         className="w-full h-10 border border-gray-400 rounded mb-3 px-3"
@@ -53,7 +53,7 @@ const Crawl = () => {
         onPress={handleScan}
         disabled={loading}
       >
-        <Text className="text-white text-center">
+        <Text style={{fontFamily: 'Vercel-semi'}} className="text-white text-center">
           {loading ? "Scanning..." : "Start Scan"}
         </Text>
       </TouchableOpacity>
@@ -66,14 +66,14 @@ const Crawl = () => {
       {result && (
         <ScrollView className="mt-6 bg-gray-100 rounded-lg flex-1">
               {/* Organización */}
-              <Text className="text-lg font-bold text-center mb-4">{`Results}`}</Text>
-              <View className="mb-5">
-                <Text className="text-xl font-bold">General Information</Text>
-                {result.endpoints && <Text>{`Endpoints: ${result.endpoints}`}</Text>}
+              <Text className="text-lg font-bold text-center mb-4">{`Results`}</Text>
+              <View className="rounded-lg border-2 border-gray-400 bg-gray-200 p-2 mt-2">
+                <Text style={{fontFamily: 'Vercel-semi'}}  className="text-xl font-bold text-center">General Information</Text>
+                {result.endpoints && <Text style={{fontFamily: 'Vercel'}}>{`Endpoints: ${result.endpoints}`}</Text>}
                 <Text className="text-xl font-bold">Robots.txt</Text>
                 {result.robots_txt && (
               <View>
-                {result.robots_txt.Allow && (
+                {result.robots_txt.Allow && ( 
                   <View>
                     <Text className="font-bold">Allow:</Text>
                     {result.robots_txt.Allow.map((path, index) => (

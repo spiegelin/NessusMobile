@@ -41,7 +41,7 @@ const Passwords = () => {
     <View className="flex-1 p-5">
       <View className="flex-col justify-between items-center w-full mb-6">
         
-      <Text style={{ fontFamily: 'Vercel-semi', fontSize: 55}} className="mt-20 mb-5 text-center">Passwords Scan</Text>
+      <Text style={{ fontFamily: 'Vercel-semi', fontSize: 55}} className="text-center">Passwords Scan</Text>
       </View>
       <TextInput
         className="w-full h-10 border border-gray-400 rounded mb-3 px-3"
@@ -54,7 +54,7 @@ const Passwords = () => {
         onPress={handleScan}
         disabled={loading}
       >
-        <Text className="text-white text-center">
+        <Text style={{fontFamily: 'Vercel-semi'}} className="text-white text-center">
           {loading ? "Scanning..." : "Start Scan"}
         </Text>
       </TouchableOpacity>
@@ -68,12 +68,11 @@ const Passwords = () => {
         <ScrollView className="mt-6 bg-gray-100 rounded-lg flex-1">
               {/* Organización */}
               <Text style={{fontFamily: 'Vercel-semi', fontSize : 30}} className="text-center">{`Results`}</Text>
-              <View className="mb-5">
-                <Text style={{fontFamily: 'Vercel-semi', fontSize : 20}} className="my-2 ">General Information</Text>
-                {result.balance && <Text style={{fontFamily: 'Vercel-semi', fontSize: 20}}>{`Balance: ${result.balance}`}</Text>}
+              <View className="mb-5"> 
+                {result.balance && <Text style={{fontFamily: 'Vercel-semi', fontSize: 20}}>{`Results: ${result.balance}`}</Text>}
                 {Array.isArray(result.entries) && result.entries.map((entry, index) => (
-                  <View key={index} className="my-2">
-                    {entry.id && <Text style={{fontFamily: 'Vercel'}} className="my-2 ">{`ID: ${entry.id}`}</Text>}
+                  <View key={index} className="rounded-lg border-2 border-gray-400 bg-gray-200 p-2 mt-2">
+                    {entry.id && <Text style={{fontFamily: 'Vercel-semi'}} className="my-2 ">{`ID: ${entry.id}`}</Text>}
                     {entry.email && <Text style={{fontFamily: 'Vercel'}} className="my-2 ">{`Email: ${entry.email}`}</Text>}
                     {entry.ip_address && <Text style={{fontFamily: 'Vercel'}} className="my-2 ">{`IP Address: ${entry.ip_address}`}</Text>}
                     {entry.username && <Text style={{fontFamily: 'Vercel'}} className="my-2 ">{`Username: ${entry.username}`}</Text>}

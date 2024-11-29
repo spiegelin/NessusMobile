@@ -40,7 +40,7 @@ const Socials = () => {
   return (
     <View className="flex-1 p-5">
       {/* Header */}
-      <Text style={{ fontFamily: 'Vercel-semi', fontSize: 40 }} className="mt-20 mb-5 text-center">
+      <Text style={{ fontFamily: 'Vercel-semi', fontSize: 40 }} className=" mb-5 text-center">
         Socials Scan
       </Text>
 
@@ -75,17 +75,16 @@ const Socials = () => {
       {result && (
         <ScrollView className="mt-6 bg-gray-100 rounded-lg flex-1 p-3">
           {/* Organization Info */}
-          <Text style={{fontFamily: 'Vercel-semi', fontSize: 30}} className="">{`Organization: ${result.organization_info.name}`}</Text>
-          <View className="mb-5">
-            <Text style={{fontFamily: 'Vercel-semi', fontSize: 25}} className="">General Information</Text>
-            <Text>{`Domain: ${result.organization_info.domain}`}</Text>
-            <Text>{`Description: ${result.organization_info.description}`}</Text>
-            <Text>{`Industry: ${result.organization_info.industry}`}</Text>
-            <Text>{`Size: ${result.organization_info.size}`}</Text>
-            <Text>{`Country: ${result.organization_info.country || 'N/A'}`}</Text>
-            <Text>{`City: ${result.organization_info.city || 'N/A'}`}</Text>
-            <Text>{`State: ${result.organization_info.state || 'N/A'}`}</Text>
-            <Text>{`Street: ${result.organization_info.street || 'N/A'}`}</Text>
+          <Text style={{fontFamily: 'Vercel-semi', fontSize: 30}} className="bg-black p-2 text-white rounded-lg my-2">{`${result.organization_info.name}`}</Text>
+          <View className="rounded-lg border-2 border-gray-400 bg-gray-200 p-2 mt-2">
+            <Text className="" style={{fontFamily: 'Vercel-semi'}}>{`Domain: ${result.organization_info.domain}`}</Text>
+            <Text style={{fontFamily: 'Vercel'}}>{`Description: ${result.organization_info.description}`}</Text>
+            <Text style={{fontFamily: 'Vercel'}}>{`Industry: ${result.organization_info.industry}`}</Text>
+            <Text style={{fontFamily: 'Vercel'}}>{`Size: ${result.organization_info.size}`}</Text>
+            <Text style={{fontFamily: 'Vercel'}}>{`Country: ${result.organization_info.country || 'N/A'}`}</Text>
+            <Text style={{fontFamily: 'Vercel'}}>{`City: ${result.organization_info.city || 'N/A'}`}</Text>
+            <Text style={{fontFamily: 'Vercel'}}>{`State: ${result.organization_info.state || 'N/A'}`}</Text>
+            <Text style={{fontFamily: 'Vercel'}} >{`Street: ${result.organization_info.street || 'N/A'}`}</Text>
 
             <Text style={{fontFamily: 'Vercel-semi'}} className=" mt-2">Socials:</Text>
             <Text style={{fontFamily: 'Vercel'}}>{`Twitter: ${result.organization_info.twitter || 'N/A'}`}</Text>
@@ -95,7 +94,7 @@ const Socials = () => {
           </View>
 
           {/* Employees Info */}
-          <Text style={{fontFamily: 'Vercel-semi', fontSize: 25}} className="my-5">Employees</Text>
+          <Text style={{fontFamily: 'Vercel-semi', fontSize: 25}} className="bg-black p-2 text-white rounded-lg mt-3">Employees</Text>
           {result.employees.map((employee, index) => (
             <View key={index} className="mt-3 p-3 border border-gray-300 rounded">
               <Text style={{fontFamily: 'Vercel-semi', fontSize: 20}} className="">{`Name: ${employee.name}`}</Text>
