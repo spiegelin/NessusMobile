@@ -67,36 +67,54 @@ const Shodan = () => {
       {result && (
         <ScrollView className="mt-6 bg-gray-100 rounded-lg flex-1">
               {/* Organización */}
-              <View className="mb-5">
+              <View className="mb-5 ">
                 {result.ip && <Text style={{fontFamily: 'Vercel-semi', fontSize: 20}} className="rounded-lg p-2 bg-black text-center text-white">{`${result.ip}`}</Text>}
                 {result.hostnames && (
-  <>
-    <Text style={{ fontFamily: 'Vercel' }} className="my-2">
-      Hostnames:
-    </Text>
-    <View className="flex flex-wrap flex-row">
-      {result.hostnames.map((hostname, index) => (
-        <Text
-          key={index}
-          style={{ fontFamily: 'Vercel' }}
-          className="bg-gray-200 p-2 m-1 rounded"
-        >
-          {hostname}
-        </Text>
-      ))}
-    </View>
-  </>
-)}
+                <View className="rounded-lg border-2 border-gray-400 bg-gray-200 p-2 mt-2 ">
+                  <Text style={{ fontFamily: 'Vercel-semi' }} className="my-2 bg-black p-2 text-white rounded-lg text-center">
+                    Hostnames
+                  </Text>
+                  <View className="flex flex-wrap flex-row">
+                    {result.hostnames.map((hostname, index) => (
+                      <Text
+                        key={index}
+                        style={{ fontFamily: 'Vercel' }}  
+                        className="bg-gray-700 p-2 text-center text-white m-1 rounded"
+                      >
+                        {hostname}
+                      </Text>
+                    ))}
+                  </View>
+                </View>
+              )}
 
-                {result.ports && <Text style={{fontFamily: 'Vercel', fontSize: 10}} className="my-2">{`Ports: ${result.ports.join(", ")}`}</Text>}
-                {result.city && <Text style={{fontFamily: 'Vercel'}} className="my-2">{`City: ${result.city}`}</Text>}
-                {result.country && <Text style={{fontFamily: 'Vercel'}} className="my-2">{`Country: ${result.country}`}</Text>}
-                {result.latlon && <Text style={{fontFamily: 'Vercel'}} className="my-2">{`LatLon: ${result.latlon}`}</Text>}
-                <Text style={{fontFamily: 'Vercel-semi', fontSize: 20}} className=" mt-2">Vulnerabilities:</Text>
+                {result.ports && (
+                  <View className="rounded-lg border-2 border-gray-400 bg-gray-200 p-2 mt-2">
+                    <Text style={{ fontFamily: 'Vercel-semi' }} className="my-2 bg-black p-2 text-white rounded-lg text-center">
+                      Ports
+                    </Text>
+                    <View className="flex flex-wrap flex-row">
+                      {result.ports.map((port, index) => (
+                        <Text
+                          key={index}
+                          style={{ fontFamily: 'Vercel' }}
+                          className="bg-gray-700 p-2 text-center text-white m-1 rounded"
+                        >
+                          {port}
+                        </Text>
+                      ))}
+                    </View>
+                  </View>
+                )}
+
+                {result.city && <Text style={{fontFamily: 'Vercel-semi'}} className="mt-2">{`City: ${result.city}`}</Text>}
+                {result.country && <Text style={{fontFamily: 'Vercel-semi'}} className="">{`Country: ${result.country}`}</Text>}
+                {result.latlon && <Text style={{fontFamily: 'Vercel-semi'}} className="">{`LatLon: ${result.latlon}`}</Text>}
+                <Text style={{fontFamily: 'Vercel-semi', fontSize: 20}} className="mt-4 bg-black p-2 text-white rounded-lg text-center">Vulnerabilities</Text>
                 {result.vulnerabilities.map((vuln, index) => (
                   <View key={index} className="mt-3">
-                    {vuln.cve_id && <Text style={{fontFamily: 'Vercel-semi'}} className="">{`CVE ID: ${vuln.cve_id}`}</Text>}
-                    {vuln.cvss && <Text style={{fontFamily: 'Vercel-semi'}} className="">{`CVSS: ${vuln.cvss}`}</Text>}
+                    {vuln.cve_id && <Text style={{fontFamily: 'Vercel-semi'}} className="my-2">{`CVE ID: ${vuln.cve_id}`}</Text>}
+                    {vuln.cvss && <Text style={{fontFamily: 'Vercel-semi'}} className="mb-2">{`CVSS: ${vuln.cvss}`}</Text>}
                     {vuln.published_time && <Text style={{fontFamily: 'Vercel'}} className="font-semibold">{`Published Time: ${vuln.published_time}`}</Text>}
                     {vuln.summary && <Text style={{fontFamily: 'Vercel'}} className="font-semibold">{`Summary: ${vuln.summary}`}</Text>}
                   </View>

@@ -36,11 +36,15 @@ const WebAppScan = () => {
       setLoading(false);
     }
   };
-
+  const sanitizeHtml = (html: string): string => {
+    return html.replace(/<\/?[^>]+(>|$)/g, ""); // Removes any HTML tags.
+  };
+  
+  
   return (
     <View className="flex-1 p-5">
       <View className="flex-col justify-between items-center w-full mb-6">
-        <Text style={{ fontFamily: 'Vercel-semi', fontSize: 40 }} className="mt-20 mb-5 text-center">
+        <Text style={{ fontFamily: 'Vercel-semi', fontSize: 40 }} className=" text-center">
           Web App Scan
         </Text>
       </View>
@@ -67,17 +71,28 @@ const WebAppScan = () => {
       )}
       {result && ( 
         <ScrollView className="mt-6 bg-gray-100 p-4 rounded-lg flex-1">
-              <Text className="" style={{ fontFamily: 'Vercel', fontSize: 10 }}>{`Generated: ${result.generated}`}</Text>
+          <Text className="text-gray-700" style={{ fontFamily: 'Vercel-semi', fontSize: 9 }}>{`${result['@generated']}`}</Text>
               {result.site.map((site, index) => (
                 <View key={index} className="mb-5">
-                  <Text className="" style={{ fontFamily: 'Vercel-semi', fontSize: 25 }}>{`Site: ${site.name}`}</Text>
+
+                  <Text className="rounded-lg bg-black text-white p-2 mt-2" style={{ fontFamily: 'Vercel-semi', fontSize: 21 }}>{`${site['@name']}`}</Text>
                   {site.alerts.map((alert, alertIndex) => (
                     <View key={alertIndex} className="mt-3">
                       <Text className="font-semibold" style={{ fontFamily: 'Vercel-semi', fontSize: 18 }}>{`Alert: ${alert.alert}`}</Text>
                       
                       <Text style={{ fontFamily: 'Vercel', fontSize: 12 }} className="my-2">{`Confidence: ${alert.confidence}`}</Text>
-                      <Text style={{ fontFamily: 'Vercel-semi', fontSize: 18  }}>{`Risk: ${alert.riskdesc}`}</Text>
-                      <Text className="my-2" style={{ fontFamily: 'Vercel', fontSize: 14 }} >{`Description: ${alert.desc}`}</Text>
+                      <Text
+                        className={`${
+                          alert.riskdesc[0] === 'H' ? 'bg-red-500 text-white rounded-lg p-2'  :
+                          alert.riskdesc[0] === 'M' ? 'bg-orange-500 text-white rounded-lg p-2' :
+                          alert.riskdesc[0] === 'L' ? 'bg-yellow-500 text-white rounded-lg p-2' :
+                          'text-gray-600'
+                        }`}
+                        style={{ fontFamily: 'Vercel-semi', fontSize: 18 }}
+                      >
+                        {`Risk: ${alert.riskdesc}`}
+                      </Text>
+                      <Text className="my-2 rounded-lg text-white bg-black p-2" style={{ fontFamily: 'Vercel', fontSize: 14 }} >{sanitizeHtml(alert.desc)}</Text>
                       <Text className="my-2" style={{ fontFamily: 'Vercel-semi', fontSize: 14 }}>Instances:</Text>
                       {alert.instances.map((instance: { uri: any; attack: any ; evidence: any; otherinfo: any; }, instanceIndex: React.Key | null | undefined) => (
                         <View key={instanceIndex} className="ml-2">
