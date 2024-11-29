@@ -46,7 +46,7 @@ const RegisterScreen = ({ navigation }: RegisterScreenProps) => {
     } else {
       setError('');
       try {
-        const response = await axios.post(`http://10.0.2.2:3000/register`, {
+        const response = await axios.post(`http://localhost:3000/register`, {
           email,
           username,
           password
