@@ -27,7 +27,7 @@ export type RootStackParamList = {
   ViewReports: undefined;
   SecurityAwareness: undefined;
   ScanHistory: undefined;
-  AdvancedScan: undefined;
+  AdvancedScans: undefined;
   OSINTsearch: undefined;
   WebAppScan: undefined;
   MalwareScan: undefined;
@@ -61,7 +61,7 @@ const App = () => {
         <Stack.Screen name="OSINTsearch" component={OSINTsearch} />
         <Stack.Screen name="ScanHistory" component={ScanHistory} />
 
-        <Stack.Screen name="AdvancedScan" component={AdvancedScans} />
+        <Stack.Screen name="AdvancedScans" component={AdvancedScans} />
         <Stack.Screen name="WebAppScan" component={WebAppScan} />
         <Stack.Screen name="MalwareScan" component={MalwareScan} />
         <Stack.Screen name="HostDiscovery" component={HostDiscovery} />
